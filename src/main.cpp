@@ -1,7 +1,7 @@
 /*
     SNAKE
-    Version: 24.0.0
-    23.06.2017
+    Version: 25.0.0
+    24.06.2017
 
     Raffer Paul
     1BHEL 22
@@ -146,6 +146,8 @@ typedef struct
     vector <Gebaeude_x> kanone;
     vector <Gebaeude_x> krankenhaus;
     vector <Gebaeude_x> geldlager;
+    vector <Gebaeude_x> mauer;
+    //vector <Gebaeude_x> teleporter;
 
 } Gebaeude;
 
@@ -493,7 +495,8 @@ void gebaeude_zeichnen( vector <Spieler> &spieler, vector <Gebaeude_x> &gebaeude
         for( unsigned int x = gebaeude.at(g).start_pos.x; x <= gebaeude.at(g).ende_pos.x; x ++ )
         {
             if((( gebaeude.at(g).name == "GELDLAGER" ) && (( x == gebaeude.at(g).start_pos.x ) || ( x == gebaeude.at(g).ende_pos.x ) || ( y == gebaeude.at(g).start_pos.y ) || ( y == gebaeude.at(g).ende_pos.y )))
-            || (( gebaeude.at(g).name == "KRANKENHAUS" ) && (( x - gebaeude.at(g).start_pos.x == ( gebaeude.at(g).ende_pos.x - gebaeude.at(g).start_pos.x ) / 2 ) || ( y - gebaeude.at(g).start_pos.y == ( gebaeude.at(g).ende_pos.y - gebaeude.at(g).start_pos.y ) / 2 ))))
+            || (( gebaeude.at(g).name == "KRANKENHAUS" ) && (( x - gebaeude.at(g).start_pos.x == ( gebaeude.at(g).ende_pos.x - gebaeude.at(g).start_pos.x ) / 2 ) || ( y - gebaeude.at(g).start_pos.y == ( gebaeude.at(g).ende_pos.y - gebaeude.at(g).start_pos.y ) / 2 )))
+            || ( gebaeude.at(g).name == "MAUER" ))
             {
                 SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(s).farbe.at(1));
             }
@@ -633,7 +636,7 @@ void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, u
             if( spieler.at(s).gebaeude.krankenhaus.at(i).betreten == true )
             {
                 spieler.at(s).gebaeude.krankenhaus.at(i).zeit_betreten.ende = clock() - spieler.at(s).gebaeude.krankenhaus.at(i).zeit_betreten.start;
-                if( spieler.at(s).gebaeude.krankenhaus.at(i).zeit_betreten.ende >= 40000 )
+                if( spieler.at(s).gebaeude.krankenhaus.at(i).zeit_betreten.ende >= spieler.at(s).gebaeude.krankenhaus.at(i).zeit_betreten.pause )
                 {
                     spieler.at(s).leben ++;
                     spieler.at(s).gebaeude.krankenhaus.at(i).zeit_betreten.start = clock();
@@ -761,6 +764,7 @@ void spieler_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &p
             gebaeude_farbe( spieler, spieler.at(i).gebaeude.kanone, s, i );
             gebaeude_farbe( spieler, spieler.at(i).gebaeude.krankenhaus, s, i );
             gebaeude_farbe( spieler, spieler.at(i).gebaeude.geldlager, s, i );
+            gebaeude_farbe( spieler, spieler.at(i).gebaeude.mauer, s, i );
         }
 
         gotoXY( spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).x, spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).y );
@@ -906,7 +910,7 @@ void gebaeude( vector <Spieler> &spieler, unsigned int s )
 
         if(( spieler.at(s).gebaeude.kanone.at(i).gebaut == true )
         && ( spieler.at(s).gebaeude.kanone.at(i).verschieben == false )
-        && ( spieler.at(s).gebaeude.kanone.at(i).zeit_ereignis.ende >= 1200 ))
+        && ( spieler.at(s).gebaeude.kanone.at(i).zeit_ereignis.ende >= spieler.at(s).gebaeude.kanone.at(i).zeit_ereignis.pause ))
         {
             spieler.at(s).gebaeude.kanone.at(i).zeit_ereignis.start = clock();
 
@@ -928,7 +932,7 @@ void punkte_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned i
     {
         spieler.at(s).punkt.at(i).zeit.ende = clock() - spieler.at(s).punkt.at(i).zeit.start;
 
-        if( spieler.at(s).punkt.at(i).zeit.ende >= 40 )
+        if( spieler.at(s).punkt.at(i).zeit.ende >= spieler.at(s).punkt.at(i).zeit.pause )
         {
             spieler.at(s).punkt.at(i).zeit.start = clock();
 
@@ -1036,7 +1040,19 @@ void gebaeude_verschieben( Spielfeld &spielfeld, vector <Spieler> &spieler, vect
                 gebaeude.at(i).ende_pos.y --;
             }
 
-            else if ( spieler.at(s).schlange.richtung == spieler.at(s).tasten.oben_rechts )
+
+            bool bauen;
+
+            for( unsigned int i = 0; i < spieler.at(s).gebaeude.zentrale.size(); i ++ )
+            {
+                if(( gebaeude.at(i).start_pos.x - spieler.at(s).gebaeude.zentrale.at(i).ende_pos.x <= 3 )
+                && ( gebaeude.at(i).start_pos.x - spieler.at(s).gebaeude.zentrale.at(i).ende_pos.x <= 3 ))
+                {
+                    bauen = true;
+                }
+            }
+
+            if (( spieler.at(s).schlange.richtung == spieler.at(s).tasten.oben_rechts ) && ( bauen == true ))
             {
                 gebaeude.at(i).verschieben = false;
                 v = false;
@@ -1057,6 +1073,7 @@ void spieler_menue( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned in
     gebaeude_verschieben( spielfeld, spieler, spieler.at(s).gebaeude.kanone, s, v );
     gebaeude_verschieben( spielfeld, spieler, spieler.at(s).gebaeude.krankenhaus, s, v );
     gebaeude_verschieben( spielfeld, spieler, spieler.at(s).gebaeude.geldlager, s, v );
+    gebaeude_verschieben( spielfeld, spieler, spieler.at(s).gebaeude.mauer, s, v );
 
     if( v == false )
     {
@@ -1083,10 +1100,10 @@ void spieler_menue( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned in
 
         else if( spieler.at(s).menue_seite == 99 )
         {
-            spieler.at(s).menue_seite = 103;
+            spieler.at(s).menue_seite = 104;
         }
 
-        else if( spieler.at(s).menue_seite == 104 )
+        else if( spieler.at(s).menue_seite == 105 )
         {
             spieler.at(s).menue_seite = 100;
         }
@@ -1098,6 +1115,7 @@ void spieler_menue( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned in
             {
                 spieler.at(s).gebaeude.zentrale.resize( spieler.at(s).gebaeude.zentrale.size() + 1 );
                 spieler.at(s).gebaeude.zentrale.at( spieler.at(s).gebaeude.zentrale.size() - 1 ).name = "ZENTRALE";
+                spieler.at(s).gebaeude.zentrale.at( spieler.at(s).gebaeude.zentrale.size() - 1 ).level = 1;
                 spieler.at(s).gebaeude.zentrale.at( spieler.at(s).gebaeude.zentrale.size() - 1 ).kosten = 100000;
                 spieler.at(s).gebaeude.zentrale.at( spieler.at(s).gebaeude.zentrale.size() - 1 ).start_pos.x = spielfeld.groesse.x / 2;
                 spieler.at(s).gebaeude.zentrale.at( spieler.at(s).gebaeude.zentrale.size() - 1 ).start_pos.y = spielfeld.groesse.y / 2;
@@ -1110,13 +1128,20 @@ void spieler_menue( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned in
                     spieler.at(s).gebaeude.zentrale.at( spieler.at(s).gebaeude.zentrale.size() - 1 ).gebaut = true;
                     spieler.at(s).gebaeude.zentrale.at( spieler.at(s).gebaeude.zentrale.size() - 1 ).verschieben = true;
                 }
+
+                else
+                {
+                    spieler.at(s).gebaeude.zentrale.resize( spieler.at(s).gebaeude.zentrale.size() - 1 );
+                }
             }
 
             if( spieler.at(s).menue_seite == 101 )
             {
                 spieler.at(s).gebaeude.kanone.resize( spieler.at(s).gebaeude.kanone.size() + 1 );
                 spieler.at(s).gebaeude.kanone.at( spieler.at(s).gebaeude.kanone.size() - 1 ).name = "KANONE";
+                spieler.at(s).gebaeude.kanone.at( spieler.at(s).gebaeude.kanone.size() - 1 ).level = 1;
                 spieler.at(s).gebaeude.kanone.at( spieler.at(s).gebaeude.kanone.size() - 1 ).kosten = 1000;
+                spieler.at(s).gebaeude.kanone.at( spieler.at(s).gebaeude.kanone.size() - 1 ).zeit_ereignis.pause = 1000;
                 spieler.at(s).gebaeude.kanone.at( spieler.at(s).gebaeude.kanone.size() - 1 ).start_pos.x = spielfeld.groesse.x / 2;
                 spieler.at(s).gebaeude.kanone.at( spieler.at(s).gebaeude.kanone.size() - 1 ).start_pos.y = spielfeld.groesse.y / 2;
                 spieler.at(s).gebaeude.kanone.at( spieler.at(s).gebaeude.kanone.size() - 1 ).ende_pos.x = spieler.at(s).gebaeude.kanone.at( spieler.at(s).gebaeude.kanone.size() - 1 ).start_pos.x + 4;
@@ -1134,7 +1159,9 @@ void spieler_menue( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned in
             {
                 spieler.at(s).gebaeude.krankenhaus.resize( spieler.at(s).gebaeude.krankenhaus.size() + 1 );
                 spieler.at(s).gebaeude.krankenhaus.at( spieler.at(s).gebaeude.krankenhaus.size() - 1 ).name = "KRANKENHAUS";
+                spieler.at(s).gebaeude.krankenhaus.at( spieler.at(s).gebaeude.krankenhaus.size() - 1 ).level = 1;
                 spieler.at(s).gebaeude.krankenhaus.at( spieler.at(s).gebaeude.krankenhaus.size() - 1 ).kosten = 1500;
+                spieler.at(s).gebaeude.krankenhaus.at( spieler.at(s).gebaeude.krankenhaus.size() - 1 ).zeit_betreten.pause = 60000;
                 spieler.at(s).gebaeude.krankenhaus.at( spieler.at(s).gebaeude.krankenhaus.size() - 1 ).start_pos.x = spielfeld.groesse.x / 2;
                 spieler.at(s).gebaeude.krankenhaus.at( spieler.at(s).gebaeude.krankenhaus.size() - 1 ).start_pos.y = spielfeld.groesse.y / 2;
                 spieler.at(s).gebaeude.krankenhaus.at( spieler.at(s).gebaeude.krankenhaus.size() - 1 ).ende_pos.x = spieler.at(s).gebaeude.krankenhaus.at( spieler.at(s).gebaeude.krankenhaus.size() - 1 ).start_pos.x + 8;
@@ -1145,8 +1172,6 @@ void spieler_menue( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned in
                     spieler.at(s).geld -= spieler.at(s).gebaeude.krankenhaus.at( spieler.at(s).gebaeude.krankenhaus.size() - 1 ).kosten;
                     spieler.at(s).gebaeude.krankenhaus.at( spieler.at(s).gebaeude.krankenhaus.size() - 1 ).gebaut = true;
                     spieler.at(s).gebaeude.krankenhaus.at( spieler.at(s).gebaeude.krankenhaus.size() - 1 ).verschieben = true;
-
-
                 }
             }
 
@@ -1154,17 +1179,37 @@ void spieler_menue( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned in
             {
                 spieler.at(s).gebaeude.geldlager.resize( spieler.at(s).gebaeude.geldlager.size() + 1 );
                 spieler.at(s).gebaeude.geldlager.at( spieler.at(s).gebaeude.geldlager.size() - 1 ).name = "GELDLAGER";
+                spieler.at(s).gebaeude.geldlager.at( spieler.at(s).gebaeude.geldlager.size() - 1 ).level = 1;
                 spieler.at(s).gebaeude.geldlager.at( spieler.at(s).gebaeude.geldlager.size() - 1 ).kosten = 600;
                 spieler.at(s).gebaeude.geldlager.at( spieler.at(s).gebaeude.geldlager.size() - 1 ).start_pos.x = spielfeld.groesse.x / 2;
                 spieler.at(s).gebaeude.geldlager.at( spieler.at(s).gebaeude.geldlager.size() - 1 ).start_pos.y = spielfeld.groesse.y / 2;
                 spieler.at(s).gebaeude.geldlager.at( spieler.at(s).gebaeude.geldlager.size() - 1 ).ende_pos.x = spieler.at(s).gebaeude.geldlager.at( spieler.at(s).gebaeude.geldlager.size() - 1 ).start_pos.x + 11;
-                spieler.at(s).gebaeude.geldlager.at( spieler.at(s).gebaeude.geldlager.size() - 1 ).ende_pos.y = spieler.at(s).gebaeude.geldlager.at( spieler.at(s).gebaeude.geldlager.size() - 1 ).start_pos.y+ 11;
+                spieler.at(s).gebaeude.geldlager.at( spieler.at(s).gebaeude.geldlager.size() - 1 ).ende_pos.y = spieler.at(s).gebaeude.geldlager.at( spieler.at(s).gebaeude.geldlager.size() - 1 ).start_pos.y + 11;
 
                 if( spieler.at(s).geld >= spieler.at(s).gebaeude.geldlager.at( spieler.at(s).gebaeude.geldlager.size() - 1 ).kosten )
                 {
                     spieler.at(s).geld -= spieler.at(s).gebaeude.geldlager.at( spieler.at(s).gebaeude.geldlager.size() - 1 ).kosten;
                     spieler.at(s).gebaeude.geldlager.at( spieler.at(s).gebaeude.geldlager.size() - 1 ).gebaut = true;
                     spieler.at(s).gebaeude.geldlager.at( spieler.at(s).gebaeude.geldlager.size() - 1 ).verschieben = true;
+                }
+            }
+
+            else if( spieler.at(s).menue_seite == 104 )
+            {
+                spieler.at(s).gebaeude.mauer.resize( spieler.at(s).gebaeude.mauer.size() + 1 );
+                spieler.at(s).gebaeude.mauer.at( spieler.at(s).gebaeude.mauer.size() - 1 ).name = "MAUER";
+                spieler.at(s).gebaeude.mauer.at( spieler.at(s).gebaeude.mauer.size() - 1 ).level = 1;
+                spieler.at(s).gebaeude.mauer.at( spieler.at(s).gebaeude.mauer.size() - 1 ).kosten = 20;
+                spieler.at(s).gebaeude.mauer.at( spieler.at(s).gebaeude.mauer.size() - 1 ).start_pos.x = spielfeld.groesse.x / 2;
+                spieler.at(s).gebaeude.mauer.at( spieler.at(s).gebaeude.mauer.size() - 1 ).start_pos.y = spielfeld.groesse.y / 2;
+                spieler.at(s).gebaeude.mauer.at( spieler.at(s).gebaeude.mauer.size() - 1 ).ende_pos.x = spieler.at(s).gebaeude.mauer.at( spieler.at(s).gebaeude.mauer.size() - 1 ).start_pos.x;
+                spieler.at(s).gebaeude.mauer.at( spieler.at(s).gebaeude.mauer.size() - 1 ).ende_pos.y = spieler.at(s).gebaeude.mauer.at( spieler.at(s).gebaeude.mauer.size() - 1 ).start_pos.y;
+
+                if( spieler.at(s).geld >= spieler.at(s).gebaeude.mauer.at( spieler.at(s).gebaeude.mauer.size() - 1 ).kosten )
+                {
+                    spieler.at(s).geld -= spieler.at(s).gebaeude.mauer.at( spieler.at(s).gebaeude.mauer.size() - 1 ).kosten;
+                    spieler.at(s).gebaeude.mauer.at( spieler.at(s).gebaeude.mauer.size() - 1 ).gebaut = true;
+                    spieler.at(s).gebaeude.mauer.at( spieler.at(s).gebaeude.mauer.size() - 1 ).verschieben = true;
                 }
             }
 
@@ -1175,7 +1220,7 @@ void spieler_menue( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned in
         }
 
         gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 2 );
-        cout << "SPIELERMENUE     ";
+        cout << "SPIELERMENUE";
 
         if( spieler.at(s).menue_seite == 100 )
         {
@@ -1201,6 +1246,12 @@ void spieler_menue( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned in
             cout << "< GELDLAGER >";
         }
 
+        else if( spieler.at(s).menue_seite == 104 )
+        {
+            gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3 );
+            cout << "< MAUER >";
+        }
+
         else
         {
             gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3 );
@@ -1224,7 +1275,6 @@ void menue_pause( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkt
          << "5| EINSTELLUNGEN\n"
          << "0| SPIEL BEENDEN\n";
 
-
     switch( getch() )
     {
     case'1':
@@ -1240,7 +1290,7 @@ void menue_pause( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkt
 
 void menue_cheats( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, time_t t )
 {
-    system("cls");
+    system( "cls" );
 
     if( spielfeld.cheats == true )
     {
@@ -1316,10 +1366,10 @@ bool gameover( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &
     bool gameover = spieler.at(s).gameover;
 
     if(( spieler.at(s).schlange.waende == true )
-            && (( spieler.at(s).schlange.pos.at(0).x == 0 )
-                || ( spieler.at(s).schlange.pos.at(0).y == 0)
-                || (spieler.at(s).schlange.pos.at(0).x == spielfeld.groesse.x + 1)
-                || (spieler.at(s).schlange.pos.at(0).y == spielfeld.groesse.y + 1)))
+    && (( spieler.at(s).schlange.pos.at(0).x == 0 )
+    || ( spieler.at(s).schlange.pos.at(0).y == 0)
+    || (spieler.at(s).schlange.pos.at(0).x == spielfeld.groesse.x + 1)
+    || (spieler.at(s).schlange.pos.at(0).y == spielfeld.groesse.y + 1)))
     {
         leben( spielfeld, spieler, s );
     }
@@ -1351,12 +1401,9 @@ bool gameover( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &
             for( unsigned int j = 0; j < spieler.at(sp).punkt.size(); j ++ )
             {
                 if(( spieler.at(s).schlange.pos.at(i).x == spieler.at(sp).punkt.at(j).pos.x )
-                        && ( spieler.at(s).schlange.pos.at(i).y == spieler.at(sp).punkt.at(j).pos.y )
-                        && ( sp != s ))
+                && ( spieler.at(s).schlange.pos.at(i).y == spieler.at(sp).punkt.at(j).pos.y )
+                && ( sp != s ))
                 {
-                    spieler.at(sp).punkt.at(j).pos.x = 0;
-                    spieler.at(sp).punkt.at(j).pos.y = 0;
-
                     spieler.at(sp).geld += spieler.at(s).geld;
                     leben( spielfeld, spieler, s );
                     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(sp).farbe.at(0));
@@ -1369,6 +1416,7 @@ bool gameover( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &
         gebaeude_gameover( spielfeld, spieler, spieler.at(sp).gebaeude.kanone, s, sp );
         gebaeude_gameover( spielfeld, spieler, spieler.at(sp).gebaeude.krankenhaus, s, sp );
         gebaeude_gameover( spielfeld, spieler, spieler.at(sp).gebaeude.geldlager, s, sp );
+        gebaeude_gameover( spielfeld, spieler, spieler.at(sp).gebaeude.mauer, s, sp );
     }
 
     for( unsigned int i = 1; i < spieler.at(s).schlange.pos.size(); i ++ )
@@ -1455,11 +1503,12 @@ int main()
         for( unsigned int i = 0; i < spieler.size(); i ++ )
         {
             spieler.at(i).gebaeude.zentrale.resize(1);
+            spieler.at(i).gebaeude.zentrale.at(0).name = "ZENTRALE";
             spieler.at(i).gebaeude.kanone.resize(0);
             spieler.at(i).gebaeude.krankenhaus.resize(0);
             spieler.at(i).gebaeude.geldlager.resize(0);
-
-            spieler.at(i).gebaeude.zentrale.at(0).name = "BAUPLATZ";
+            spieler.at(i).gebaeude.mauer.resize(0);
+            //spieler.at(i).gebaeude.teleporter.resize(0);
         }
 
 
