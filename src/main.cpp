@@ -1,34 +1,84 @@
 /*
-    SNAKE
-    *****************************
-
-    Version:        1.28.0
-    Datum:          --.06.2017
-    *****************************
-
-    ENTWICKLER
-    Name:           Raffer Paul
-    Schule:         HTL Hollabrunn
-    Klasse:         1BHEL
-    Katalognummer:  22
-    *****************************
+    SPIELANLEITUNG SNAKE
+    ***********************************************************************
 
     INFORMATIONEN ZUM SPIEL
 
+    Name:           Snake
+    Version:        1.30.0
+    Datum:          28.06.2017
     Spieler: 1-4
 
-    GEBÄUDE:
+    ************************************************************************
+
+    ENTWICKLER
+
+    Name:           Raffer Paul
+    Schule:         HTBL Hollabrunn
+    Klasse:         1BHEL
+    Katalognummer:  22
+
+    *************************************************************************
+
+    SPIELFELD
+
+    Es kann mit voreingestellter Spielfeldgröße gespielt ("1" oder "2" drücken, 1: X=156 Y=71, 2: X=235 Y=63) oder die Spielfeldgröße vor dem Spiel eingegeben werden.
+
+      0 1 2 3 4 5
+    0 + + + + + +
+    1 +         +
+    2 +         +
+    3 +         +
+    4 +         +
+    5 + + + + + +
+
+    **************************************************************************
+
+    STEUERUNG
+
+    In den Einstellungen kann man die Tsten, die für die Steuerung verwendet werden festlegen.
+    Folgende Tasten sind voreingestellt:
+
+    SPIELER 1       *   SPIELER 2       *   SPIELER 3       *   SPIELER 4
+                    *                   *                   *
+    q   w   e       *   r   t   z       *   u   i   o       *   7   8   9
+      \ | /         *     \ | /         *     \ | /         *     \ | /
+    a --x-- d       *   f --b-- h       *   j --,-- l       *   4 --2-- 6
+      / | \         *     / | \         *     / | \         *     / | \
+    y   s   c       *   v   g   n       *   m   k   .       *   1   5   3
+                    *                   *                   *
+    Oben:       w   *   Oben:       t   *   Oben:       i   *   Oben:       8
+    Unten:      s   *   Unten:      g   *   Unten:      k   *   Unten:      5
+    Links:      a   *   Links:      f   *   Links:      j   *   Links:      4
+    Rechts:     d   *   Rechts:     h   *   Rechts:     l   *   Rechts:     6
+                    *                   *                   *
+    Obenlinks:  q   *   Obenlinks:  r   *   Obenlinks:  u   *   Obenlinks:  7
+    Obenrechts: e   *   Obenrechts: z   *   Obenrechts: o   *   Obenrechts: 9
+    Untenlinks: y   *   Untenlinks: v   *   Untenlinks: m   *   Untenlinks: 1
+    Untenrechts:c   *   Untenrechts:n   *   Untenrechts:.   *   Untenrechts:3
+                    *                   *                   *
+    Pause:      x   *   Pause:      b   *   Pause:      ,   *   Pause:      2
+
+    ***************************************************************************
+
+    GEBÄUDE
+
     Zentrale
     Kanone
     Krankenhaus
     Geldlager
     Mauer
 
-    PUNKTE:
+    ***************************************************************************
+
+    PUNKTE
+
     Essen
     Geld
     Leben
     Hindernis
+
+    ***************************************************************************
 */
 
 #include <iostream>
@@ -43,6 +93,15 @@
 using namespace std;
 
 
+
+typedef struct
+{
+    unsigned int
+    tag,
+    monat,
+    jahr;
+
+} Datum;
 
 typedef struct
 {
@@ -127,7 +186,7 @@ typedef struct
 
     bool
     diagonal_fahren = true,
-    waende = true,
+    waende = false,
     name_anzeigen = true,
 
     bewegen = true;
@@ -240,12 +299,34 @@ typedef struct
 
 } Punkte;
 
+typedef struct
+{
+    string
+    name,
+    version;
 
+    Datum datum;
+
+} Spiel_info;
+
+typedef struct
+{
+    string name;
+    Spielfeld spielfeld;
+    vector <Spieler> spieler;
+    Punkte punkte;
+
+} Spiel;
+
+
+
+void zeile( char zeichen );
+void spielanleitung( Spiel_info& spiel_info );
 
 int eingaben( Spielfeld &spielfeld, vector <Spieler> &spieler );
 
 
-void spiel( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, time_t t );
+void spiel_start( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, time_t t );
 
 
 void spielfeld_erstellen( Spielfeld &spielfeld, vector <Spieler> &spieler );
@@ -289,6 +370,100 @@ void farben();
 
 
 
+void zeile( char zeichen )
+{
+    cout << endl;
+    for( unsigned int z = 0; z < 100; z ++ )
+    {
+        cout << zeichen;
+    }
+    cout << endl << endl;
+}
+
+void spielanleitung( Spiel_info& spiel_info )
+{
+    cout << "SPIELANLEITUNG SNAKE\n";
+    zeile( '*' );
+
+    cout << "INFORMATIONEN ZUM SPIEL\n"
+         << endl
+         << "Name:\t\t" << spiel_info.name << endl
+         << "Version:\t" << spiel_info.version << endl
+         << "Datum:\t" << spiel_info.datum.tag << '.' << spiel_info.datum.monat << '.' << spiel_info.datum.jahr << endl;
+
+    zeile( '*' );
+
+    cout << "ENTWICKLER\n"
+         << endl
+         << "Name:           Raffer Paul\n"
+         << "Schule:         HTBL Hollabrunn\n"
+         << "Klasse:         1BHEL\n"
+         << "Katalognummer:  22\n";
+
+    zeile( '*' );
+
+    cout << "SPIELFELD\n"
+         << endl
+         << "Es kann mit voreingestellter Spielfeldgröße gespielt (\"1\" oder \"2\" drücken, 1: X=156 Y=71, 2: X=235 Y=63) oder die Spielfeldgröße vor dem Spiel eingegeben werden.\n"
+         << endl
+         << "  0 1 2 3 4 5\n"
+         << "0 + + + + + +\n"
+         << "1 +         +\n"
+         << "2 +         +\n"
+         << "3 +         +\n"
+         << "4 +         +\n"
+         << "5 + + + + + +\n";
+
+    zeile( '*' );
+
+    cout << "STEUERUNG\n"
+         << endl
+         << "In den Einstellungen kann man die Tasten, die für die Steuerung verwendet werden festlegen.\n"
+         << "Folgende Tasten sind voreingestellt\n"
+
+         << "SPIELER 1       *   SPIELER 2       *   SPIELER 3       *   SPIELER 4\n"
+         << "                *                   *                   *\n"
+         << "q   w   e       *   r   t   z       *   u   i   o       *   7   8   9\n"
+         << "  \\ | /         *     \\ | /         *     \\ | /         *     \\ | /\n"
+         << "a --x-- d       *   f --b-- h       *   j --,-- l       *   4 --2-- 6\n"
+         << "  / | \\         *     / | \\         *     / | \\         *     / | \\\n"
+         << "y   s   c       *   v   g   n       *   m   k   .       *   1   5   3\n"
+         << "                *                   *                   *\n"
+         << "Oben:       w   *   Oben:       t   *   Oben:       i   *   Oben:       8\n"
+         << "Unten:      s   *   Unten:      g   *   Unten:      k   *   Unten:      5\n"
+         << "Links:      a   *   Links:      f   *   Links:      j   *   Links:      4\n"
+         << "Rechts:     d   *   Rechts:     h   *   Rechts:     l   *   Rechts:     6\n"
+         << "                *                   *                   *\n"
+         << "Obenlinks:  q   *   Obenlinks:  r   *   Obenlinks:  u   *   Obenlinks:  7\n"
+         << "Obenrechts: e   *   Obenrechts: z   *   Obenrechts: o   *   Obenrechts: 9\n"
+         << "Untenlinks: y   *   Untenlinks: v   *   Untenlinks: m   *   Untenlinks: 1\n"
+         << "Untenrechts:c   *   Untenrechts:n   *   Untenrechts:.   *   Untenrechts:3\n"
+         << "                *                   *                   *\n"
+         << "Pause:      x   *   Pause:      b   *   Pause:      ,   *   Pause:      2\n";
+
+    zeile( '*' );
+/*
+    GEBÄUDE
+
+    Zentrale
+    Kanone
+    Krankenhaus
+    Geldlager
+    Mauer
+
+    zeile( '*' );
+
+    PUNKTE
+
+    Essen
+    Geld
+    Leben
+    Hindernis
+
+    zeile( '*' );*/
+
+}
+
 int eingaben( Spielfeld &spielfeld, vector <Spieler> &spieler )
 {
     int s;
@@ -322,7 +497,7 @@ int eingaben( Spielfeld &spielfeld, vector <Spieler> &spieler )
 }
 
 
-void spiel( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, time_t t )
+void spiel_start( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, time_t t )
 {
     bool wiederholen = true;
 
@@ -1044,7 +1219,7 @@ void gebaeude( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s )
         && ( spieler.at(s).gebaeude.kanone._.at(i).richtung != ' ' ))
         {
             spieler.at(s).gebaeude.kanone._.at(i).zeit_ereignis.start = clock();
-            if( spieler.at(s).gebaeude.kanone._.at(i).punkt.size() < spieler.at(s).gebaeude.kanone._.at(i).level )
+            if( spieler.at(s).gebaeude.kanone._.at(i).punkt.size() < 10 )
             {
                 spieler.at(s).gebaeude.kanone._.at(i).punkt.resize( spieler.at(s).gebaeude.kanone._.at(i).punkt.size() + 1 );
 
@@ -1451,7 +1626,7 @@ void menue_pause( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkt
     switch( getch() )
     {
     case'1':
-        spiel( spielfeld, spieler, punkte, t );
+        spiel_start( spielfeld, spieler, punkte, t );
         break;
 
     case'4':
@@ -1489,7 +1664,7 @@ void menue_cheats( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punk
         Sleep( 800 );
     }
 
-    spiel( spielfeld, spieler, punkte, t );
+    spiel_start( spielfeld, spieler, punkte, t );
 }
 
 
@@ -1619,12 +1794,13 @@ void farben()
 {
     system( "cls" );
 
-    for( unsigned int f = 0; f < 256; f ++ )
+    for( unsigned int zahl = 0; zahl < 256; zahl ++ )
     {
-        unsigned char z = f;
+        unsigned int farbe = zahl;
+        unsigned char zeichen = zahl;
 
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-        cout << f << '\t' << z << endl;
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), farbe);
+        cout << zahl << '\t' << zeichen << endl;
     }
 
     getch();
@@ -1633,232 +1809,212 @@ void farben()
 
 int main()
 {
-    char wiederholen = '2';
+    Spiel_info spiel_info;
+
+    spiel_info.name = "Snake";
+    spiel_info.version = "1.30.0";
+    spiel_info.datum.tag = 28;
+    spiel_info.datum.monat = 6;
+    spiel_info.datum.jahr = 2017;
+    spielanleitung( spiel_info );
 
     system( "color 84" );
 
-    Spielfeld spielfeld;
-    Punkte punkte;
-    vector <Spieler> spieler;
+    Spiel spiel;
 
     time_t t;
 
     time(&t);
     srand(( unsigned int )t );
 
-        spieler.resize( eingaben( spielfeld, spieler ) );
+        spiel.spieler.resize( eingaben( spiel.spielfeld, spiel.spieler ) );
 
-        punkte.essen.resize(1);
-        for( unsigned int i = 0; i < punkte.essen.size(); i ++ )
+        spiel.punkte.essen.resize(1);
+        for( unsigned int i = 0; i < spiel.punkte.essen.size(); i ++ )
         {
-            punkte.essen.at(i).farbe = 240;
-            punkte.essen.at(i).zeichen = 'o';
+            spiel.punkte.essen.at(i).farbe = 240;
+            spiel.punkte.essen.at(i).zeichen = 'o';
         }
 
-        punkte.geld.resize(1);
-        for( unsigned int i = 0; i < punkte.geld.size(); i ++ )
+        spiel.punkte.geld.resize(1);
+        for( unsigned int i = 0; i < spiel.punkte.geld.size(); i ++ )
         {
-            punkte.geld.at(i).farbe = 224;
-            punkte.geld.at(i).zeichen = '$';
+            spiel.punkte.geld.at(i).farbe = 224;
+            spiel.punkte.geld.at(i).zeichen = '$';
         }
 
-        punkte.leben.resize(1);
-        for( unsigned int i = 0; i < punkte.leben.size(); i ++ )
+        spiel.punkte.leben.resize(1);
+        for( unsigned int i = 0; i < spiel.punkte.leben.size(); i ++ )
         {
-            punkte.leben.at(i).farbe = 192;
-            punkte.leben.at(i).zeichen = 197;
+            spiel.punkte.leben.at(i).farbe = 192;
+            spiel.punkte.leben.at(i).zeichen = 197;
         }
 
-        punkte.hindernis.resize(0);
-        for( unsigned int i = 0; i < punkte.hindernis.size(); i ++ )
+        spiel.punkte.hindernis.resize(0);
+        for( unsigned int i = 0; i < spiel.punkte.hindernis.size(); i ++ )
         {
-            punkte.hindernis.at(i).farbe = 15;
-            punkte.hindernis.at(i).zeichen = 'X';
+            spiel.punkte.hindernis.at(i).farbe = 15;
+            spiel.punkte.hindernis.at(i).zeichen = 'X';
         }
 
-        for( unsigned int i = 0; i < spieler.size(); i ++ )
+        for( unsigned int i = 0; i < spiel.spieler.size(); i ++ )
         {
-            spieler.at(i).gebaeude.zentrale._.resize(1);
-            spieler.at(i).gebaeude.zentrale.name = "Zentrale";
-            spieler.at(i).gebaeude.zentrale.kosten = 10000;
+            spiel.spieler.at(i).gebaeude.zentrale._.resize(1);
+            spiel.spieler.at(i).gebaeude.zentrale.name = "Zentrale";
+            spiel.spieler.at(i).gebaeude.zentrale.info = "";
+            spiel.spieler.at(i).gebaeude.zentrale.kosten = 10000;
 
-            spieler.at(i).gebaeude.kanone._.resize(0);
-            spieler.at(i).gebaeude.kanone.name = "Kanone";
-            spieler.at(i).gebaeude.kanone.kosten = 1500;
+            spiel.spieler.at(i).gebaeude.kanone._.resize(0);
+            spiel.spieler.at(i).gebaeude.kanone.name = "Kanone";
+            spiel.spieler.at(i).gebaeude.kanone.info = "";
+            spiel.spieler.at(i).gebaeude.kanone.kosten = 1500;
 
-            spieler.at(i).gebaeude.krankenhaus._.resize(0);
-            spieler.at(i).gebaeude.krankenhaus.name = "Krankenhaus";
-            spieler.at(i).gebaeude.krankenhaus.kosten = 3000;
+            spiel.spieler.at(i).gebaeude.krankenhaus._.resize(0);
+            spiel.spieler.at(i).gebaeude.krankenhaus.name = "Krankenhaus";
+            spiel.spieler.at(i).gebaeude.krankenhaus.info = "";
+            spiel.spieler.at(i).gebaeude.krankenhaus.kosten = 3000;
 
-            spieler.at(i).gebaeude.geldlager._.resize(0);
-            spieler.at(i).gebaeude.geldlager.name = "Geldlager";
-            spieler.at(i).gebaeude.geldlager.kosten = 200;
+            spiel.spieler.at(i).gebaeude.geldlager._.resize(0);
+            spiel.spieler.at(i).gebaeude.geldlager.name = "Geldlager";
+            spiel.spieler.at(i).gebaeude.geldlager.info = "";
+            spiel.spieler.at(i).gebaeude.geldlager.kosten = 200;
 
-            spieler.at(i).gebaeude.mauer._.resize(0);
-            spieler.at(i).gebaeude.mauer.name = "Mauer";
-            spieler.at(i).gebaeude.mauer.kosten = 20;
+            spiel.spieler.at(i).gebaeude.mauer._.resize(0);
+            spiel.spieler.at(i).gebaeude.mauer.name = "Mauer";
+            spiel.spieler.at(i).gebaeude.mauer.info = "";
+            spiel.spieler.at(i).gebaeude.mauer.kosten = 20;
 
-            spieler.at(i).gebaeude.teleporter._.resize(0);
-            spieler.at(i).gebaeude.teleporter.name = "Teleporter";
-            spieler.at(i).gebaeude.teleporter.kosten = 1000;
+            spiel.spieler.at(i).gebaeude.teleporter._.resize(0);
+            spiel.spieler.at(i).gebaeude.teleporter.name = "Teleporter";
+            spiel.spieler.at(i).gebaeude.teleporter.info = "";
+            spiel.spieler.at(i).gebaeude.teleporter.kosten = 1000;
         }
 
 
-        spielfeld.seite_menue.resize(1000);
+        spiel.spielfeld.seite_menue.resize(1000);
 
-        spielfeld.seite_menue.at(0).name = "SHOP";
-        spielfeld.seite_menue.at(0).naechste_seite = 10;
+        spiel.spielfeld.seite_menue.at(0).name = "SHOP";
+        spiel.spielfeld.seite_menue.at(0).naechste_seite = 10;
 
-        spielfeld.seite_menue.at(1).name = "";
+        spiel.spielfeld.seite_menue.at(1).name = "";
 
-        spielfeld.seite_menue.at(2).name = "";
+        spiel.spielfeld.seite_menue.at(2).name = "";
 
-        spielfeld.seite_menue.at(3).name = "";
+        spiel.spielfeld.seite_menue.at(3).name = "";
 
-        spielfeld.seite_menue.at(10).name = "GEBAEUDE";
-        spielfeld.seite_menue.at(10).naechste_seite = 100;
+        spiel.spielfeld.seite_menue.at(10).name = "GEBAEUDE";
+        spiel.spielfeld.seite_menue.at(10).naechste_seite = 100;
 
         ifstream datei( "spieler.txt" );
 
-        for( unsigned int i = 0; i < spieler.size(); i ++ )
+        for( unsigned int i = 0; i < spiel.spieler.size(); i ++ )
         {
             unsigned int farben;
 
-            datei >> spieler.at(i).name
+            datei >> spiel.spieler.at(i).name
 
                   >> farben;
-            spieler.at(i).farbe.resize( farben );
-            for( unsigned int f = 0; f < spieler.at(i).farbe.size(); f ++ )
+            spiel.spieler.at(i).farbe.resize( farben );
+            for( unsigned int f = 0; f < spiel.spieler.at(i).farbe.size(); f ++ )
             {
-                datei >> spieler.at(i).farbe.at(f);
+                datei >> spiel.spieler.at(i).farbe.at(f);
             }
 
-            datei >> spieler.at(i).tasten.oben
-                  >> spieler.at(i).tasten.unten
-                  >> spieler.at(i).tasten.links
-                  >> spieler.at(i).tasten.rechts
+            datei >> spiel.spieler.at(i).tasten.oben
+                  >> spiel.spieler.at(i).tasten.unten
+                  >> spiel.spieler.at(i).tasten.links
+                  >> spiel.spieler.at(i).tasten.rechts
 
-                  >> spieler.at(i).tasten.oben_links
-                  >> spieler.at(i).tasten.oben_rechts
-                  >> spieler.at(i).tasten.unten_links
-                  >> spieler.at(i).tasten.unten_rechts
+                  >> spiel.spieler.at(i).tasten.oben_links
+                  >> spiel.spieler.at(i).tasten.oben_rechts
+                  >> spiel.spieler.at(i).tasten.unten_links
+                  >> spiel.spieler.at(i).tasten.unten_rechts
 
-                  >> spieler.at(i).tasten.menue
+                  >> spiel.spieler.at(i).tasten.menue
 
-                  >> spieler.at(i).leben
-                  >> spieler.at(i).geld;
+                  >> spiel.spieler.at(i).leben
+                  >> spiel.spieler.at(i).geld;
         }
 
-        if( spieler.size() >= 1 )
+        if( spiel.spieler.size() >= 1 )
         {
-            spieler.at(0).gebaeude.zentrale._.at(0).start_pos.x = 1;
-            spieler.at(0).gebaeude.zentrale._.at(0).start_pos.y = 1;
-            spieler.at(0).gebaeude.zentrale._.at(0).ende_pos.x = 20;
-            spieler.at(0).gebaeude.zentrale._.at(0).ende_pos.y = 20;
+            spiel.spieler.at(0).gebaeude.zentrale._.at(0).start_pos.x = 1;
+            spiel.spieler.at(0).gebaeude.zentrale._.at(0).start_pos.y = 1;
+            spiel.spieler.at(0).gebaeude.zentrale._.at(0).ende_pos.x = 20;
+            spiel.spieler.at(0).gebaeude.zentrale._.at(0).ende_pos.y = 20;
         }
 
-        if( spieler.size() >= 2 )
+        if( spiel.spieler.size() >= 2 )
         {
-            spieler.at(1).gebaeude.zentrale._.at(0).start_pos.x = spielfeld.groesse.x - 19;
-            spieler.at(1).gebaeude.zentrale._.at(0).start_pos.y = 1;
-            spieler.at(1).gebaeude.zentrale._.at(0).ende_pos.x = spielfeld.groesse.x;
-            spieler.at(1).gebaeude.zentrale._.at(0).ende_pos.y = 20;
+            spiel.spieler.at(1).gebaeude.zentrale._.at(0).start_pos.x = spiel.spielfeld.groesse.x - 19;
+            spiel.spieler.at(1).gebaeude.zentrale._.at(0).start_pos.y = 1;
+            spiel.spieler.at(1).gebaeude.zentrale._.at(0).ende_pos.x = spiel.spielfeld.groesse.x;
+            spiel.spieler.at(1).gebaeude.zentrale._.at(0).ende_pos.y = 20;
         }
 
-        if( spieler.size() >= 3 )
+        if( spiel.spieler.size() >= 3 )
         {
-            spieler.at(2).gebaeude.zentrale._.at(0).start_pos.x = 1;
-            spieler.at(2).gebaeude.zentrale._.at(0).start_pos.y = spielfeld.groesse.y - 19;
-            spieler.at(2).gebaeude.zentrale._.at(0).ende_pos.x = 20;
-            spieler.at(2).gebaeude.zentrale._.at(0).ende_pos.y = spielfeld.groesse.y;
+            spiel.spieler.at(2).gebaeude.zentrale._.at(0).start_pos.x = 1;
+            spiel.spieler.at(2).gebaeude.zentrale._.at(0).start_pos.y = spiel.spielfeld.groesse.y - 19;
+            spiel.spieler.at(2).gebaeude.zentrale._.at(0).ende_pos.x = 20;
+            spiel.spieler.at(2).gebaeude.zentrale._.at(0).ende_pos.y = spiel.spielfeld.groesse.y;
         }
 
-        if( spieler.size() >= 4 )
+        if( spiel.spieler.size() >= 4 )
         {
-            spieler.at(3).gebaeude.zentrale._.at(0).start_pos.x = spielfeld.groesse.x - 19;
-            spieler.at(3).gebaeude.zentrale._.at(0).start_pos.y = spielfeld.groesse.y - 19;
-            spieler.at(3).gebaeude.zentrale._.at(0).ende_pos.x = spielfeld.groesse.x;
-            spieler.at(3).gebaeude.zentrale._.at(0).ende_pos.y = spielfeld.groesse.y;
+            spiel.spieler.at(3).gebaeude.zentrale._.at(0).start_pos.x = spiel.spielfeld.groesse.x - 19;
+            spiel.spieler.at(3).gebaeude.zentrale._.at(0).start_pos.y = spiel.spielfeld.groesse.y - 19;
+            spiel.spieler.at(3).gebaeude.zentrale._.at(0).ende_pos.x = spiel.spielfeld.groesse.x;
+            spiel.spieler.at(3).gebaeude.zentrale._.at(0).ende_pos.y = spiel.spielfeld.groesse.y;
         }
 
-        if( spieler.size() >= 5 )
+        if( spiel.spieler.size() >= 5 )
         {
-            for( unsigned int i = 4; i < spieler.size(); i ++ )
+            for( unsigned int i = 4; i < spiel.spieler.size(); i ++ )
             {
-                spieler.at(i).computer = true;
+                spiel.spieler.at(i).computer = true;
 
-                spieler.at(i).name = "SPIELER";
-                spieler.at(i).farbe.resize(2);
-                spieler.at(i).farbe.at(0) = 200;
-                spieler.at(i).farbe.at(1) = 280;
+                spiel.spieler.at(i).name = "SPIELER";
+                spiel.spieler.at(i).farbe.resize(2);
+                spiel.spieler.at(i).farbe.at(0) = 200;
+                spiel.spieler.at(i).farbe.at(1) = 280;
 
-                spieler.at(i).tasten.oben = 'W';
-                spieler.at(i).tasten.unten = 'S';
-                spieler.at(i).tasten.links = 'A';
-                spieler.at(i).tasten.rechts = 'D';
+                spiel.spieler.at(i).tasten.oben = 'W';
+                spiel.spieler.at(i).tasten.unten = 'S';
+                spiel.spieler.at(i).tasten.links = 'A';
+                spiel.spieler.at(i).tasten.rechts = 'D';
 
-                spieler.at(i).tasten.oben_links = 'Q';
-                spieler.at(i).tasten.oben_rechts = 'E';
-                spieler.at(i).tasten.unten_links = 'Y';
-                spieler.at(i).tasten.unten_rechts = 'C';
+                spiel.spieler.at(i).tasten.oben_links = 'Q';
+                spiel.spieler.at(i).tasten.oben_rechts = 'E';
+                spiel.spieler.at(i).tasten.unten_links = 'Y';
+                spiel.spieler.at(i).tasten.unten_rechts = 'C';
 
-                spieler.at(i).tasten.menue = 'X';
+                spiel.spieler.at(i).tasten.menue = 'X';
             }
         }
 
-        for( unsigned int i = 0; i < spieler.size(); i ++ )
+        for( unsigned int i = 0; i < spiel.spieler.size(); i ++ )
         {
-            spieler.at(i).punkte = 0;
-            spieler.at(i).menue_seite = 0;
-            spieler.at(i).gameover = false;
+            spiel.spieler.at(i).punkte = 0;
+            spiel.spieler.at(i).menue_seite = 0;
+            spiel.spieler.at(i).gameover = false;
 
-            spieler.at(i).schlange.pos.resize( 10 );
-            spieler.at(i).schlange.richtung = ' ';
+            spiel.spieler.at(i).schlange.pos.resize( 10 );
+            spiel.spieler.at(i).schlange.richtung = ' ';
 
-            spieler.at(i).schlange.pos.at(0).x = spielfeld.groesse.x / spieler.size() * i + spielfeld.groesse.x / ( spieler.size() * 2 );
-            spieler.at(i).schlange.pos.at(0).y = spielfeld.groesse.y / 2 + 1;
+            spiel.spieler.at(i).schlange.pos.at(0).x = spiel.spielfeld.groesse.x / spiel.spieler.size() * i + spiel.spielfeld.groesse.x / ( spiel.spieler.size() * 2 );
+            spiel.spieler.at(i).schlange.pos.at(0).y = spiel.spielfeld.groesse.y / 2 + 1;
 
-            spieler.at(i).gebaeude.zentrale._.at(0).gebaut = true;
-            spieler.at(i).schlange.zeit.pause = 50;
+            spiel.spieler.at(i).gebaeude.zentrale._.at(0).gebaut = true;
+            spiel.spieler.at(i).schlange.zeit.pause = 50;
         }
 
-        punkte_erstellen( punkte.essen, spielfeld, spieler, t );
-        punkte_erstellen( punkte.hindernis, spielfeld, spieler, t );
+        punkte_erstellen( spiel.punkte.essen, spiel.spielfeld, spiel.spieler, t );
+        punkte_erstellen( spiel.punkte.hindernis, spiel.spielfeld, spiel.spieler, t );
 
-        spielfeld.zeit.start = clock();
-        spiel( spielfeld, spieler, punkte, t );
-
-
-        /*system( "cls" );
-        cout << "SPIELENDE";
-
-        Spielfeld spielende;
-        spielende.groesse.x = 20 * spieler.size();
-        spielende.groesse.y = 0;
-
-        for( unsigned int s = 0; s < spieler.size(); s ++ )
-        {
-            spieler_informationen( spielende, spieler, s );
-        }
-
-        cout << endl
-             << endl
-             << "1| WIEDERHOLEN\n"
-             << "2| NEUES SPIEL\n"
-             << "0| BEENDEN\n";
-
-        wiederholen = getch();*/
+        spiel.spielfeld.zeit.start = clock();
+        spiel_start( spiel.spielfeld, spiel.spieler, spiel.punkte, t );
 
 
-/*
-AUFGABEN:
-gebaeude nicht übereinander bauen
-gebeude beim verschieben neu färben
-teleporter fertigstellen
-mehr files
-gebaeude verbessern
-gebaeude abreißen
-gebaeude verschieben
-*/
     return 0;
 }
