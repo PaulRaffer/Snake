@@ -52,7 +52,17 @@ typedef struct
 
 typedef struct
 {
+    unsigned int
+    hintergrund,
+    spielfeld = 600,
+    wand = 200;
+
+} Farben;
+
+typedef struct
+{
     Koordinaten groesse;
+    Farben farbe;
 
     bool
     cheats = false,
@@ -60,10 +70,7 @@ typedef struct
     cursor = true;
 
     unsigned int
-    pause = 10,
-
-    farbe_spielfeld = 600,
-    farbe_wand = 200;
+    pause = 10;
 
     char
     beenden = '!',
@@ -111,7 +118,8 @@ typedef struct
     reichweite,
     kosten,
     level,
-    farbe;
+    farbe,
+    zahl;
 
     char
     richtung;
@@ -291,7 +299,7 @@ void spielfeld_erstellen( Spielfeld &spielfeld, vector <Spieler> &spieler )
 
     system("cls");
 
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe_wand);
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe.wand);
     for( x = 0; x <= spielfeld.groesse.x + 1; x ++ )
     {
         cout << '+';
@@ -302,13 +310,13 @@ void spielfeld_erstellen( Spielfeld &spielfeld, vector <Spieler> &spieler )
     {
         cout << '+';
 
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe_spielfeld);
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe.spielfeld);
         for( x = 1; x <= spielfeld.groesse.x; x ++ )
         {
             cout << ' ';
         }
 
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe_wand);
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe.wand);
         cout << "+\n";
     }
 
@@ -429,11 +437,22 @@ void gebaeude_zeichnen( vector <Spieler> &spieler, unsigned int s, unsigned int 
 {
     for( unsigned int y = spieler.at(s).gebaeude.at(g).start_pos.y; y <= spieler.at(s).gebaeude.at(g).ende_pos.y; y ++ )
     {
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(s).farbe.at(0));
+
+
         gotoXY( spieler.at(s).gebaeude.at(g).start_pos.x, y );
 
         for( unsigned int x = spieler.at(s).gebaeude.at(g).start_pos.x; x <= spieler.at(s).gebaeude.at(g).ende_pos.x; x ++ )
         {
+            if((( g == 3 ) && (( x == spieler.at(s).gebaeude.at(g).start_pos.x ) || ( x == spieler.at(s).gebaeude.at(g).ende_pos.x ) || ( y == spieler.at(s).gebaeude.at(g).start_pos.y ) || ( y == spieler.at(s).gebaeude.at(g).ende_pos.y )))
+            || (( g == 2) && (( x - spieler.at(s).gebaeude.at(g).start_pos.x == ( spieler.at(s).gebaeude.at(g).ende_pos.x - spieler.at(s).gebaeude.at(g).start_pos.x ) / 2 ) || ( y - spieler.at(s).gebaeude.at(g).start_pos.y == ( spieler.at(s).gebaeude.at(g).ende_pos.y - spieler.at(s).gebaeude.at(g).start_pos.y ) / 2 ))))
+            {
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(s).farbe.at(1));
+            }
+
+            else
+            {
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(s).farbe.at(0));
+            }
             cout << ' ';
         }
     }
@@ -555,10 +574,27 @@ void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, u
                 spieler.at(s).leben ++;
                 spieler.at(s).gebaeude.at(2).zeit.start = clock();
 
-                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(s).farbe.at(0));
-                gotoXY( spielfeld.groesse.x / spieler.size() * s + 8, spielfeld.groesse.y + 6 );
-                cout << spieler.at(s).leben;
+                spieler_informationen( spielfeld, spieler, s );
+                spieler.at(s).schlange.richtung = spieler.at(s).schlange.richtung_alt;
             }
+        }
+
+        else if( spieler.at(s).gebaeude.at(3).betreten == true )
+        {
+            if( spieler.at(s).schlange.richtung == spieler.at(s).tasten.oben )
+            {
+                spieler.at(s).gebaeude.at(3).zahl += spieler.at(s).geld;
+                spieler.at(s).geld = 0;
+            }
+
+            else if( spieler.at(s).schlange.richtung == spieler.at(s).tasten.unten )
+            {
+                spieler.at(s).geld += spieler.at(s).gebaeude.at(3).zahl;
+                spieler.at(s).gebaeude.at(3).zahl = 0;
+            }
+
+            spieler_informationen( spielfeld, spieler, s );
+            spieler.at(s).schlange.richtung = spieler.at(s).schlange.richtung_alt;
         }
 
         else
@@ -581,7 +617,7 @@ void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, u
 
     if( punkte.zeit.ende > 8000 )
     {
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe_spielfeld);
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe.spielfeld);
 
         gotoXY( punkte.geld.at(0).pos.x, punkte.geld.at(0).pos.y );
         cout << ' ';
@@ -664,7 +700,7 @@ void spieler_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &p
 
         if( gebaeude == false )
         {
-            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe_spielfeld);
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe.spielfeld);
         }
 
         gotoXY( spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).x, spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).y );
@@ -842,7 +878,7 @@ void punkte_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned i
 
         for( unsigned int i = 0; i < spieler.at(s).punkt.size(); i ++ )
         {
-            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe_spielfeld);
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe.spielfeld);
             gotoXY( spieler.at(s).punkt.at(i).pos.x, spieler.at(s).punkt.at(i).pos.y );
             cout << ' ';
 
@@ -915,7 +951,7 @@ void spieler_menue( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned in
 
             for( unsigned int y = spieler.at(s).gebaeude.at(i).start_pos.y; y <= spieler.at(s).gebaeude.at(i).ende_pos.y; y ++ )
             {
-                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe_spielfeld);
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe.spielfeld);
                 gotoXY( spieler.at(s).gebaeude.at(i).start_pos.x, y );
 
                 for( unsigned int x = spieler.at(s).gebaeude.at(i).start_pos.x; x <= spieler.at(s).gebaeude.at(i).ende_pos.x; x ++ )
@@ -1253,7 +1289,7 @@ int main()
             punkte.leben.at(i).farbe = 192;
         }
 
-        punkte.hindernis.resize(100);
+        punkte.hindernis.resize(50);
         for( unsigned int i = 0; i < punkte.hindernis.size(); i ++ )
         {
             punkte.hindernis.at(i).farbe = 0;
@@ -1283,8 +1319,8 @@ int main()
             spieler.at(i).gebaeude.at(3).kosten = 1000;
             spieler.at(i).gebaeude.at(3).start_pos.x = spielfeld.groesse.x / 2;
             spieler.at(i).gebaeude.at(3).start_pos.y = spielfeld.groesse.y / 2;
-            spieler.at(i).gebaeude.at(3).ende_pos.x = spieler.at(i).gebaeude.at(3).start_pos.x + 4;
-            spieler.at(i).gebaeude.at(3).ende_pos.y = spieler.at(i).gebaeude.at(3).start_pos.y + 4;
+            spieler.at(i).gebaeude.at(3).ende_pos.x = spieler.at(i).gebaeude.at(3).start_pos.x + 11;
+            spieler.at(i).gebaeude.at(3).ende_pos.y = spieler.at(i).gebaeude.at(3).start_pos.y + 11;
         }
 
 
@@ -1419,8 +1455,7 @@ int main()
 
 
         system( "cls" );
-        cout << "SPIELENDE\n"
-             << "\n";
+        cout << "SPIELENDE";
 
         Spielfeld spielende;
         spielende.groesse.x = 20 * spieler.size();
@@ -1430,6 +1465,11 @@ int main()
         {
             spieler_informationen( spielende, spieler, s );
         }
+
+        cout << endl << endl
+             << "1| WIEDERHOLEN\n"
+             << "2| NEUES SPIEL\n"
+             << "0| BEENDEN\n";
 
         wiederholen = getch();
     }
