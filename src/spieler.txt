@@ -1,0 +1,15 @@
+Gryffindor
+w s a d   q e y c   x
+2 192 224
+
+Slytherin
+t g f h   r z v n   b
+2 160 112
+
+Hufflepuff
+i k j l   u o m .   ,
+2 224 15
+
+Ravenclaw
+8 5 4 6   7 9 1 3   2
+2 144 96
