@@ -86,7 +86,6 @@
 #include <vector>
 #include <conio.h>
 #include <windows.h>
-#include <display.h>
 #include <time.h>
 
 
@@ -636,7 +635,7 @@ void spielfeld_erstellen( Spielfeld &spielfeld, vector <Spieler> &spieler )
         for( unsigned int i = 0; i < spieler.at(sp).schlange.pos.size(); i ++ )
         {
             SetConsoleTextAttribute( GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(sp).farbe.at( i % spieler.at(sp).farbe.size() ));
-            gotoXY( spieler.at(sp).schlange.pos.at(i).x, spieler.at(sp).schlange.pos.at(i).y );
+            SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spieler.at(sp).schlange.pos.at(i).x, spieler.at(sp).schlange.pos.at(i).y} );
 
             if(( spieler.at(sp).schlange.name_anzeigen == true ) && ( i < spieler.at(sp).name.size() ))
             {
@@ -694,7 +693,7 @@ void punkte_zeichnen( vector <Punkt> &punkt )
     for( unsigned int p = 0; p < punkt.size(); p ++ )
     {
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), punkt.at(p).farbe);
-        gotoXY( punkt.at(p).pos.x, punkt.at(p).pos.y );
+        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {punkt.at(p).pos.x, punkt.at(p).pos.y});
         cout << punkt.at(p).zeichen;
     }
 }
@@ -743,7 +742,7 @@ void gebaeude_zeichnen( vector <Spieler> &spieler, Gebaeude_x &gebaeude, unsigne
 {
     for( unsigned int y = gebaeude._.at(g).start_pos.y; y <= gebaeude._.at(g).ende_pos.y; y ++ )
     {
-        gotoXY( gebaeude._.at(g).start_pos.x, y );
+        SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {gebaeude._.at(g).start_pos.x, y} );
 
         for( unsigned int x = gebaeude._.at(g).start_pos.x; x <= gebaeude._.at(g).ende_pos.x; x ++ )
         {
@@ -983,12 +982,12 @@ void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, u
     {
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe.spielfeld);
 
-        gotoXY( punkte.geld.at(0).pos.x, punkte.geld.at(0).pos.y );
+        SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {punkte.geld.at(0).pos.x, punkte.geld.at(0).pos.y} );
         cout << ' ';
         punkte.geld.at(0).pos.x = 0;
         punkte.geld.at(0).pos.y = 0;
 
-        gotoXY( punkte.leben.at(0).pos.x, punkte.leben.at(0).pos.y );
+        SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {punkte.leben.at(0).pos.x, punkte.leben.at(0).pos.y} );
         cout << ' ';
         punkte.leben.at(0).pos.x = 0;
         punkte.leben.at(0).pos.y = 0;
@@ -1032,11 +1031,11 @@ void punkte_essen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punk
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(s).farbe.at(0));
 
     spieler.at(s).punkte ++;
-    gotoXY( spielfeld.groesse.x / spieler.size() * s + 8, spielfeld.groesse.y + 3 );
+    SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s + 8, spielfeld.groesse.y + 3} );
     cout << spieler.at(s).punkte;
 
     spieler.at(s).schlange.pos.resize( spieler.at(s).schlange.pos.size() + 1 );
-    gotoXY( spielfeld.groesse.x / spieler.size() * s + 8, spielfeld.groesse.y + 4 );
+    SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s + 8, spielfeld.groesse.y + 4} );
     cout << spieler.at(s).schlange.pos.size();
 
     spieler.at(s).geld += rand() % 11;
@@ -1080,7 +1079,7 @@ void spieler_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &p
         for( unsigned int i = 0; i < spieler.at(s).schlange.pos.size(); i ++ )
         {
             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(s).farbe.at( i % spieler.at(s).farbe.size() ));
-            gotoXY( spieler.at(s).schlange.pos.at(i).x, spieler.at(s).schlange.pos.at(i).y );
+            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spieler.at(s).schlange.pos.at(i).x, spieler.at(s).schlange.pos.at(i).y} );
 
             if(( spieler.at(s).schlange.name_anzeigen == true ) && ( i < spieler.at(s).name.size() ))
             {
@@ -1105,7 +1104,7 @@ void spieler_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &p
             gebaeude_farbe( spieler, spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).x, spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).y, spieler.at(i).gebaeude.teleporter, s, i );
         }
 
-        gotoXY( spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).x, spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).y );
+        SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).x, spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).y} );
         cout << ' ';
 
         if( spieler.at(s).schlange.richtung != ' ' )
@@ -1276,7 +1275,7 @@ void punkte_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &pu
                     gebaeude_farbe( spieler, spieler.at(s).gebaeude.kanone._.at(i).punkt.at(p).pos.x, spieler.at(s).gebaeude.kanone._.at(i).punkt.at(p).pos.y, spieler.at(sp).gebaeude.teleporter, s, sp );
                 }
 
-                gotoXY( spieler.at(s).gebaeude.kanone._.at(i).punkt.at(p).pos.x, spieler.at(s).gebaeude.kanone._.at(i).punkt.at(p).pos.y );
+                SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spieler.at(s).gebaeude.kanone._.at(i).punkt.at(p).pos.x, spieler.at(s).gebaeude.kanone._.at(i).punkt.at(p).pos.y} );
                 cout << ' ';
 
                 if( spieler.at(s).gebaeude.kanone._.at(i).punkt.at(p).richtung == spieler.at(s).tasten.rechts )
@@ -1300,7 +1299,7 @@ void punkte_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &pu
                 }
 
                 SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(s).farbe.at(1));
-                gotoXY( spieler.at(s).gebaeude.kanone._.at(i).punkt.at(p).pos.x, spieler.at(s).gebaeude.kanone._.at(i).punkt.at(p).pos.y );
+                SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spieler.at(s).gebaeude.kanone._.at(i).punkt.at(p).pos.x, spieler.at(s).gebaeude.kanone._.at(i).punkt.at(p).pos.y} );
                 cout << ' ';
 
                 if(( spieler.at(s).gebaeude.kanone._.at(i).punkt.at(p).pos.x == punkte.essen.at(0).pos.x ) && ( spieler.at(s).gebaeude.kanone._.at(i).punkt.at(p).pos.y == punkte.essen.at(0).pos.y ))
@@ -1359,19 +1358,19 @@ void spieler_informationen( Spielfeld spielfeld, vector <Spieler> spieler, unsig
 
     gebaeude_zeichnen( spieler, info, s, 0 );
 
-    gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 2 );
+    SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 2} );
     cout << "Name:   " << spieler.at(s).name;
 
-    gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3 );
+    SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3} );
     cout << "Punkte: " << spieler.at(s).punkte;
 
-    gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 4 );
+    SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 4} );
     cout << "Laenge: " << spieler.at(s).schlange.pos.size();
 
-    gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 5 );
+    SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 5} );
     cout << "Geld:   " << spieler.at(s).geld << " Euro";
 
-    gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 6 );
+    SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 6} );
     cout << "Leben:  " << spieler.at(s).leben;
 }
 
@@ -1387,7 +1386,7 @@ void gebaeude_verschieben( Spielfeld &spielfeld, vector <Spieler> &spieler, Geba
 
             for( unsigned int y = gebaeude._.at(i).start_pos.y; y <= gebaeude._.at(i).ende_pos.y; y ++ )
             {
-                gotoXY( gebaeude._.at(i).start_pos.x, y );
+                SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {gebaeude._.at(i).start_pos.x, y} );
 
                 for( unsigned int x = gebaeude._.at(i).start_pos.x; x <= gebaeude._.at(i).ende_pos.x; x ++ )
                 {
@@ -1566,70 +1565,70 @@ void spieler_menue( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned in
             }
         }
 
-        gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 2 );
+        SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 2} );
         cout << "SPIELERMENUE";
 
         if( spieler.at(s).menue_seite == 100 )
         {
-            gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3 );
+            SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3} );
             cout << "< " << spieler.at(s).gebaeude.zentrale.name << " >";
 
-            gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 4 );
+            SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 4} );
             cout << "Kosten: " << spieler.at(s).gebaeude.zentrale.kosten << " Euro\t";
         }
 
         else if( spieler.at(s).menue_seite == 101 )
         {
-            gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3 );
+            SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3} );
             cout << "< " << spieler.at(s).gebaeude.kanone.name << " >";
 
-            gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 4 );
+            SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 4} );
             cout << "Kosten: " << spieler.at(s).gebaeude.kanone.kosten << " Euro\t";
         }
 
         else if( spieler.at(s).menue_seite == 102 )
         {
-            gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3 );
+            SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3} );
             cout << "< " << spieler.at(s).gebaeude.krankenhaus.name << " >";
 
-            gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 4 );
+            SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 4} );
             cout << "Kosten: " << spieler.at(s).gebaeude.krankenhaus.kosten << " Euro\t";
         }
 
         else if( spieler.at(s).menue_seite == 103 )
         {
-            gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3 );
+            SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3} );
             cout << "< " << spieler.at(s).gebaeude.geldlager.name << " >";
 
-            gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 4 );
+            SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 4} );
             cout << "Kosten: " << spieler.at(s).gebaeude.geldlager.kosten << " Euro\t";
         }
 
         else if( spieler.at(s).menue_seite == 104 )
         {
-            gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3 );
+            SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3} );
             cout << "< " << spieler.at(s).gebaeude.mauer.name << " >";
 
-            gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 4 );
+            SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 4} );
             cout << "Kosten: " << spieler.at(s).gebaeude.mauer.kosten << " Euro\t";
         }
 
         else if( spieler.at(s).menue_seite == 105 )
         {
-            gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3 );
+            SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3} );
             cout << "< " << spieler.at(s).gebaeude.teleporter.name << " >";
 
-            gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 4 );
+            SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 4} );
             cout << "Kosten: " << spieler.at(s).gebaeude.teleporter.kosten << " Euro\t";
         }
 
         else
         {
-            gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3 );
+            SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3} );
             cout << "< " << spielfeld.seite_menue.at( spieler.at(s).menue_seite ).name << " >";
         }
 
-        gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 5 );
+        SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 5} );
         cout << "Geld: " << spieler.at(s).geld << " Euro\t";
     }
 
@@ -1708,9 +1707,9 @@ void leben( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s )
         spieler.at(s).schlange.pos.at(0).y = spielfeld.groesse.y / 2 + 1;
     }
 
-    gotoXY( spielfeld.groesse.x / spieler.size() * s + 8, spielfeld.groesse.y + 6 );
+    SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s + 8, spielfeld.groesse.y + 6} );
     cout << spieler.at(s).leben;
-    gotoXY( spielfeld.groesse.x / spieler.size() * s + 8, spielfeld.groesse.y + 5 );
+    SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s + 8, spielfeld.groesse.y + 5} );
     cout << spieler.at(s).geld << " EURO      ";
 }
 
@@ -1729,7 +1728,7 @@ void gebaeude_gameover( Spielfeld &spielfeld, vector <Spieler> &spieler, Gebaeud
             spieler.at(sp).geld += spieler.at(s).geld;
             leben( spielfeld, spieler, s );
             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(sp).farbe.at(0));
-            gotoXY( spielfeld.groesse.x / spieler.size() * sp + 8, spielfeld.groesse.y + 5 );
+            SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * sp + 8, spielfeld.groesse.y + 5} );
             cout << spieler.at(sp).geld << " EURO      ";
         }
     }
@@ -1765,7 +1764,7 @@ bool gameover( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &
                 spieler.at(sp).geld += spieler.at(s).geld;
                 leben( spielfeld, spieler, s );
                 SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(sp).farbe.at(0));
-                gotoXY( spielfeld.groesse.x / spieler.size() * sp + 8, spielfeld.groesse.y + 5 );
+                SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * sp + 8, spielfeld.groesse.y + 5} );
                 cout << spieler.at(sp).geld << " EURO      ";
             }
         }
@@ -1783,7 +1782,7 @@ bool gameover( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &
                         spieler.at(sp).geld += spieler.at(s).geld;
                         leben( spielfeld, spieler, s );
                         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(sp).farbe.at(0));
-                        gotoXY( spielfeld.groesse.x / spieler.size() * sp + 8, spielfeld.groesse.y + 5 );
+                        SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * sp + 8, spielfeld.groesse.y + 5} );
                         cout << spieler.at(sp).geld << " EURO      ";
                     }
                 }
