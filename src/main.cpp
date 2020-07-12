@@ -5,8 +5,8 @@
     INFORMATIONEN ZUM SPIEL
 
     Name:           Snake
-    Version:        1.30.0
-    Datum:          28.06.2017
+    Version:        1.31.0
+    Datum:          --.06.2017
     Spieler: 1-4
 
     ************************************************************************
@@ -186,7 +186,7 @@ typedef struct
 
     bool
     diagonal_fahren = true,
-    waende = false,
+    waende = true,
     name_anzeigen = true,
 
     bewegen = true;
@@ -380,7 +380,7 @@ void zeile( char zeichen )
     cout << endl << endl;
 }
 
-void spielanleitung( Spiel_info& spiel_info )
+void spielanleitung( Spiel_info& spiel_info, vector <Spieler> &spieler )
 {
     cout << "SPIELANLEITUNG SNAKE\n";
     zeile( '*' );
@@ -389,22 +389,22 @@ void spielanleitung( Spiel_info& spiel_info )
          << endl
          << "Name:\t\t" << spiel_info.name << endl
          << "Version:\t" << spiel_info.version << endl
-         << "Datum:\t" << spiel_info.datum.tag << '.' << spiel_info.datum.monat << '.' << spiel_info.datum.jahr << endl;
+         << "Datum:\t\t" << spiel_info.datum.tag << '.' << spiel_info.datum.monat << '.' << spiel_info.datum.jahr << endl;
 
     zeile( '*' );
 
     cout << "ENTWICKLER\n"
          << endl
-         << "Name:           Raffer Paul\n"
-         << "Schule:         HTBL Hollabrunn\n"
-         << "Klasse:         1BHEL\n"
-         << "Katalognummer:  22\n";
+         << "Name:\t\tRaffer Paul\n"
+         << "Schule:\t\tHTBL Hollabrunn\n"
+         << "Klasse:\t\t1BHEL\n"
+         << "Katalognummer:\t22\n";
 
     zeile( '*' );
 
     cout << "SPIELFELD\n"
          << endl
-         << "Es kann mit voreingestellter Spielfeldgröße gespielt (\"1\" oder \"2\" drücken, 1: X=156 Y=71, 2: X=235 Y=63) oder die Spielfeldgröße vor dem Spiel eingegeben werden.\n"
+         << "Es kann mit voreingestellter Spielfeldgroesse gespielt (\"1\" oder \"2\" druecken, 1: X=156 Y=71, 2: X=235 Y=63) oder die Spielfeldgroesse vor dem Spiel eingegeben werden.\n"
          << endl
          << "  0 1 2 3 4 5\n"
          << "0 + + + + + +\n"
@@ -419,48 +419,69 @@ void spielanleitung( Spiel_info& spiel_info )
     cout << "STEUERUNG\n"
          << endl
          << "In den Einstellungen kann man die Tasten, die für die Steuerung verwendet werden festlegen.\n"
-         << "Folgende Tasten sind voreingestellt\n"
+         << "Folgende Tasten sind im Moment eingestellt:\n";
 
-         << "SPIELER 1       *   SPIELER 2       *   SPIELER 3       *   SPIELER 4\n"
-         << "                *                   *                   *\n"
-         << "q   w   e       *   r   t   z       *   u   i   o       *   7   8   9\n"
-         << "  \\ | /         *     \\ | /         *     \\ | /         *     \\ | /\n"
-         << "a --x-- d       *   f --b-- h       *   j --,-- l       *   4 --2-- 6\n"
-         << "  / | \\         *     / | \\         *     / | \\         *     / | \\\n"
-         << "y   s   c       *   v   g   n       *   m   k   .       *   1   5   3\n"
-         << "                *                   *                   *\n"
-         << "Oben:       w   *   Oben:       t   *   Oben:       i   *   Oben:       8\n"
-         << "Unten:      s   *   Unten:      g   *   Unten:      k   *   Unten:      5\n"
-         << "Links:      a   *   Links:      f   *   Links:      j   *   Links:      4\n"
-         << "Rechts:     d   *   Rechts:     h   *   Rechts:     l   *   Rechts:     6\n"
-         << "                *                   *                   *\n"
-         << "Obenlinks:  q   *   Obenlinks:  r   *   Obenlinks:  u   *   Obenlinks:  7\n"
-         << "Obenrechts: e   *   Obenrechts: z   *   Obenrechts: o   *   Obenrechts: 9\n"
-         << "Untenlinks: y   *   Untenlinks: v   *   Untenlinks: m   *   Untenlinks: 1\n"
-         << "Untenrechts:c   *   Untenrechts:n   *   Untenrechts:.   *   Untenrechts:3\n"
-         << "                *                   *                   *\n"
-         << "Pause:      x   *   Pause:      b   *   Pause:      ,   *   Pause:      2\n";
-
-    zeile( '*' );
-/*
-    GEBÄUDE
-
-    Zentrale
-    Kanone
-    Krankenhaus
-    Geldlager
-    Mauer
+    for( unsigned int s = 0; s < spieler.size(); s ++ )
+    {
+        cout << endl
+             << endl
+             << spieler.at(s).name << endl
+             << endl
+             << spieler.at(s).tasten.oben_links << "   " << spieler.at(s).tasten.oben << "   " << spieler.at(s).tasten.oben_rechts << endl
+             << "  \\ | /\n"
+             << spieler.at(s).tasten.links << " --" << spieler.at(s).tasten.menue << "-- " << spieler.at(s).tasten.rechts << endl
+             << "  / | \\\n"
+             << spieler.at(s).tasten.unten_links << "   " << spieler.at(s).tasten.unten << "   " << spieler.at(s).tasten.unten_rechts << endl
+             << endl
+             << "Oben:\t\t" << spieler.at(s).tasten.oben << endl
+             << "Unten:\t\t" << spieler.at(s).tasten.unten << endl
+             << "Links:\t\t" << spieler.at(s).tasten.links << endl
+             << "Rechts:\t\t" << spieler.at(s).tasten.rechts << endl
+             << endl
+             << "Obenlinks:\t" << spieler.at(s).tasten.oben_links << endl
+             << "Obenrechts:\t" << spieler.at(s).tasten.oben_rechts << endl
+             << "Untenlinks:\t" << spieler.at(s).tasten.unten_links << endl
+             << "Untenrechts:\t" << spieler.at(s).tasten.unten_rechts << endl
+             << endl
+             << "Pause:\t\t" << spieler.at(s).tasten.menue << endl;
+    }
 
     zeile( '*' );
 
-    PUNKTE
+    cout << "GEBAEUDE\n"
+         << endl
+         << spieler.at(0).gebaeude.zentrale.name << endl
+         << spieler.at(0).gebaeude.zentrale.kosten << "Euro\n"
+         << spieler.at(0).gebaeude.zentrale.info << endl
+         << endl
+         << spieler.at(0).gebaeude.kanone.name << endl
+         << spieler.at(0).gebaeude.kanone.kosten << "Euro\n"
+         << spieler.at(0).gebaeude.kanone.info << endl
+         << endl
+         << spieler.at(0).gebaeude.krankenhaus.name << endl
+         << spieler.at(0).gebaeude.krankenhaus.kosten << "Euro\n"
+         << spieler.at(0).gebaeude.krankenhaus.info << endl
+         << endl
+         << spieler.at(0).gebaeude.geldlager.name << endl
+         << spieler.at(0).gebaeude.geldlager.kosten << "Euro\n"
+         << spieler.at(0).gebaeude.geldlager.info << endl
+         << endl
+         << spieler.at(0).gebaeude.mauer.name << endl
+         << spieler.at(0).gebaeude.mauer.kosten << "Euro\n"
+         << spieler.at(0).gebaeude.mauer.info << endl;
+
+    zeile( '*' );
+
+    /*PUNKTE
 
     Essen
     Geld
     Leben
     Hindernis
 
-    zeile( '*' );*/
+    zeile( '*' );
+
+    getch();*/
 
 }
 
@@ -502,6 +523,11 @@ void spiel_start( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkt
     bool wiederholen = true;
 
     spielfeld_erstellen( spielfeld, spieler );
+
+    for( unsigned int s = 0; s < spieler.size(); s ++ )
+    {
+        spieler_informationen( spielfeld, spieler, s );
+    }
 
     for( unsigned int s = 0; s < spieler.size(); s ++ )
     {
@@ -846,8 +872,6 @@ void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, u
             spieler.at(s).schlange.richtung = spieler.at(s).schlange.richtung_alt;
         }
 
-        bool informationen = true;
-
         for( unsigned int i = 0; i < spieler.at(s).gebaeude.zentrale._.size(); i ++ )
         {
             if( spieler.at(s).gebaeude.zentrale._.at(i).betreten == true )
@@ -857,13 +881,7 @@ void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, u
                 punkte_zeichnen( punkte.geld );
                 punkte_zeichnen( punkte.leben );
                 punkte_zeichnen( punkte.hindernis );
-                informationen = false;
             }
-        }
-
-        if( informationen == true )
-        {
-            spieler_informationen( spielfeld, spieler, s );
         }
 
         for( unsigned int i = 0; i < spieler.at(s).gebaeude.kanone._.size(); i ++ )
@@ -1022,9 +1040,8 @@ void punkte_essen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punk
     cout << spieler.at(s).schlange.pos.size();
 
     spieler.at(s).geld += rand() % 11;
-    gotoXY( spielfeld.groesse.x / spieler.size() * s + 8, spielfeld.groesse.y + 5 );
-    cout << spieler.at(s).geld << " Euro";
 
+    spieler_informationen( spielfeld, spieler, s );
     punkte_erstellen( punkte.essen, spielfeld, spieler, t );
     punkte_zeichnen( punkte.essen );
 }
@@ -1036,8 +1053,8 @@ void punkte_geld( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkt
     spieler.at(s).geld += ( clock() - spielfeld.zeit.start ) / 1000;
     punkte.geld.at(0).pos.x = 0;
     punkte.geld.at(0).pos.y = 0;
-    gotoXY( spielfeld.groesse.x / spieler.size() * s + 8, spielfeld.groesse.y + 5 );
-    cout << spieler.at(s).geld << " Euro";
+
+    spieler_informationen( spielfeld, spieler, s );
 }
 
 void punkte_leben( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, unsigned int s )
@@ -1047,8 +1064,8 @@ void punkte_leben( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punk
     spieler.at(s).leben += 1;
     punkte.leben.at(0).pos.x = 0;
     punkte.leben.at(0).pos.y = 0;
-    gotoXY( spielfeld.groesse.x / spieler.size() * s + 8, spielfeld.groesse.y + 6 );
-    cout << spieler.at(s).leben;
+
+    spieler_informationen( spielfeld, spieler, s );
 }
 
 
@@ -1219,7 +1236,7 @@ void gebaeude( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s )
         && ( spieler.at(s).gebaeude.kanone._.at(i).richtung != ' ' ))
         {
             spieler.at(s).gebaeude.kanone._.at(i).zeit_ereignis.start = clock();
-            if( spieler.at(s).gebaeude.kanone._.at(i).punkt.size() < 10 )
+            if( spieler.at(s).gebaeude.kanone._.at(i).punkt.size() < spieler.at(s).gebaeude.kanone._.at(i).level )
             {
                 spieler.at(s).gebaeude.kanone._.at(i).punkt.resize( spieler.at(s).gebaeude.kanone._.at(i).punkt.size() + 1 );
 
@@ -1332,6 +1349,15 @@ void punkte_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &pu
 void spieler_informationen( Spielfeld spielfeld, vector <Spieler> spieler, unsigned int s )
 {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(s).farbe.at(0));
+
+    Gebaeude_x info;
+    info._.resize(1);
+    info._.at(0).start_pos.x = spielfeld.groesse.x / spieler.size() * s;
+    info._.at(0).start_pos.y = spielfeld.groesse.y + 2;
+    info._.at(0).ende_pos.x = spielfeld.groesse.x / spieler.size() * ( s + 1 ) - 1;
+    info._.at(0).ende_pos.y = spielfeld.groesse.y + 6;
+
+    gebaeude_zeichnen( spieler, info, s, 0 );
 
     gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 2 );
     cout << "Name:   " << spieler.at(s).name;
@@ -1794,13 +1820,12 @@ void farben()
 {
     system( "cls" );
 
-    for( unsigned int zahl = 0; zahl < 256; zahl ++ )
+    for( unsigned int f = 0; f < 256; f ++ )
     {
-        unsigned int farbe = zahl;
-        unsigned char zeichen = zahl;
+        unsigned char z = f;
 
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), farbe);
-        cout << zahl << '\t' << zeichen << endl;
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+        cout << f << '\t' << z << endl;
     }
 
     getch();
@@ -1813,10 +1838,9 @@ int main()
 
     spiel_info.name = "Snake";
     spiel_info.version = "1.30.0";
-    spiel_info.datum.tag = 28;
+    spiel_info.datum.tag = 00;
     spiel_info.datum.monat = 6;
     spiel_info.datum.jahr = 2017;
-    spielanleitung( spiel_info );
 
     system( "color 84" );
 
@@ -1890,7 +1914,6 @@ int main()
             spiel.spieler.at(i).gebaeude.teleporter.kosten = 1000;
         }
 
-
         spiel.spielfeld.seite_menue.resize(1000);
 
         spiel.spielfeld.seite_menue.at(0).name = "SHOP";
@@ -1905,7 +1928,51 @@ int main()
         spiel.spielfeld.seite_menue.at(10).name = "GEBAEUDE";
         spiel.spielfeld.seite_menue.at(10).naechste_seite = 100;
 
-        ifstream datei( "spieler.txt" );
+        string name;
+        cin >> name;
+
+        ifstream datei( name + ".txt" );
+
+        if( datei.eof() == false )
+        {
+            ofstream datei( name + ".txt" );
+
+            datei << "ROT\n"
+                  << "0\n"
+                  << "2  192 64\n"
+                  << "w s a d   q e y c   x\n"
+                  << "0\n"
+                  << "3\n"
+                  << "200\n"
+                  << "0\n"
+                  << endl
+                  << "BLAU\n"
+                  << "0\n"
+                  << "2  144 16\n"
+                  << "t g f h   r z v n   b\n"
+                  << "0\n"
+                  << "3\n"
+                  << "200\n"
+                  << "0\n"
+                  << endl
+                  << "GELB\n"
+                  << "0\n"
+                  << "2  224 96\n"
+                  << "i k j l   u o m .   ,\n"
+                  << "0\n"
+                  << "3\n"
+                  << "200\n"
+                  << "0\n"
+                  << endl
+                  << "GRUEN\n"
+                  << "0\n"
+                  << "2  160 32\n"
+                  << "8 5 4 6   7 9 1 3   2\n"
+                  << "0\n"
+                  << "3\n"
+                  << "200\n"
+                  << "0\n";
+        }
 
         for( unsigned int i = 0; i < spiel.spieler.size(); i ++ )
         {
@@ -1913,8 +1980,11 @@ int main()
 
             datei >> spiel.spieler.at(i).name
 
+                  >> spiel.spieler.at(i).gameover
+
                   >> farben;
             spiel.spieler.at(i).farbe.resize( farben );
+
             for( unsigned int f = 0; f < spiel.spieler.at(i).farbe.size(); f ++ )
             {
                 datei >> spiel.spieler.at(i).farbe.at(f);
@@ -1932,9 +2002,14 @@ int main()
 
                   >> spiel.spieler.at(i).tasten.menue
 
+                  >> spiel.spieler.at(i).punkte
                   >> spiel.spieler.at(i).leben
-                  >> spiel.spieler.at(i).geld;
+                  >> spiel.spieler.at(i).geld
+
+                  >> spiel.spieler.at(i).menue_seite;
         }
+
+        datei.close();
 
         if( spiel.spieler.size() >= 1 )
         {
@@ -1995,10 +2070,6 @@ int main()
 
         for( unsigned int i = 0; i < spiel.spieler.size(); i ++ )
         {
-            spiel.spieler.at(i).punkte = 0;
-            spiel.spieler.at(i).menue_seite = 0;
-            spiel.spieler.at(i).gameover = false;
-
             spiel.spieler.at(i).schlange.pos.resize( 10 );
             spiel.spieler.at(i).schlange.richtung = ' ';
 
@@ -2012,9 +2083,42 @@ int main()
         punkte_erstellen( spiel.punkte.essen, spiel.spielfeld, spiel.spieler, t );
         punkte_erstellen( spiel.punkte.hindernis, spiel.spielfeld, spiel.spieler, t );
 
+        spielanleitung( spiel_info, spiel.spieler );
+
         spiel.spielfeld.zeit.start = clock();
         spiel_start( spiel.spielfeld, spiel.spieler, spiel.punkte, t );
 
 
+        /*system( "cls" );
+        cout << "SPIELENDE";
+
+        Spielfeld spielende;
+        spielende.groesse.x = 20 * spieler.size();
+        spielende.groesse.y = 0;
+
+        for( unsigned int s = 0; s < spieler.size(); s ++ )
+        {
+            spieler_informationen( spielende, spieler, s );
+        }
+
+        cout << endl
+             << endl
+             << "1| WIEDERHOLEN\n"
+             << "2| NEUES SPIEL\n"
+             << "0| BEENDEN\n";
+
+        wiederholen = getch();*/
+
+
+/*
+AUFGABEN:
+gebaeude nicht übereinander bauen
+gebeude beim verschieben neu färben *
+teleporter fertigstellen
+mehr files
+gebaeude verbessern
+gebaeude abreißen
+gebaeude verschieben
+*/
     return 0;
 }
