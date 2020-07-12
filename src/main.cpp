@@ -178,21 +178,21 @@ typedef struct
 int eingaben( Spielfeld &spielfeld, vector <Spieler> &spieler );
 
 
-void spiel( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte );
+void spiel( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, time_t t );
 
 
 void spielfeld_erstellen( Spielfeld &spielfeld, vector <Spieler> &spieler );
-void punkte_erstellen( vector <Punkt> &punkt, Spielfeld &spielfeld, vector <Spieler> &spieler );
+void punkte_erstellen( vector <Punkt> &punkt, Spielfeld &spielfeld, vector <Spieler> &spieler, time_t t );
 void punkte_zeichnen( vector <Punkt> &punkt );
 void gebaeude_zeichnen( vector <Spieler> &spieler, unsigned int s, unsigned int g );
 
 
-void richtung( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte );
+void richtung( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, time_t t );
 void richtung_spieler( char richtung, vector <Spieler> &spieler );
 void richtung_computer( vector <Spieler> &spieler, Punkte &punkte );
 
-void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, unsigned long long zaehler );
-void spieler_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, unsigned long long zaehler, unsigned int s );
+void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, unsigned long long zaehler, time_t t );
+void spieler_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, unsigned long long zaehler, unsigned int s, time_t t );
 void gebaeude( vector <Spieler> &spieler, unsigned int s );
 void punkte_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s );
 
@@ -200,8 +200,8 @@ void spieler_informationen( Spielfeld spielfeld, vector <Spieler> spieler, unsig
 void spieler_menue( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s );
 
 
-void menue_pause( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte );
-void menue_cheats( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte );
+void menue_pause( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, time_t t );
+void menue_cheats( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, time_t t );
 
 
 void leben( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s );
@@ -245,7 +245,7 @@ int eingaben( Spielfeld &spielfeld, vector <Spieler> &spieler )
 }
 
 
-void spiel( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte )
+void spiel( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, time_t t )
 {
     bool wiederholen = true;
 
@@ -270,9 +270,9 @@ void spiel( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte )
 
     for( static unsigned long long zaehler = 0; wiederholen == true; zaehler ++ )
     {
-        richtung( spielfeld, spieler, punkte );
+        richtung( spielfeld, spieler, punkte, t );
 
-        bewegen( spielfeld, spieler, punkte, zaehler );
+        bewegen( spielfeld, spieler, punkte, zaehler, t );
 
         wiederholen = true;
 
@@ -346,7 +346,7 @@ void spielfeld_erstellen( Spielfeld &spielfeld, vector <Spieler> &spieler )
 }
 
 
-void punkte_erstellen( vector <Punkt> &punkt, Spielfeld &spielfeld, vector <Spieler> &spieler )
+void punkte_erstellen( vector <Punkt> &punkt, Spielfeld &spielfeld, vector <Spieler> &spieler, time_t t )
 {
     bool wiederholen = false;
 
@@ -394,7 +394,7 @@ void punkte_zeichnen( vector <Punkt> &punkt )
 }
 
 
-void richtung( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte )
+void richtung( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, time_t t )
 {
 
     if( spielfeld.ton == true )
@@ -418,12 +418,12 @@ void richtung( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte )
 
         else if( richtung == spielfeld.menue_pause )
         {
-            menue_pause( spielfeld, spieler, punkte );
+            menue_pause( spielfeld, spieler, punkte, t );
         }
 
         else if( richtung == spielfeld.menue_cheats )
         {
-            menue_cheats( spielfeld, spieler, punkte );
+            menue_cheats( spielfeld, spieler, punkte, t );
         }
 
         richtung_spieler( richtung, spieler );
@@ -527,7 +527,7 @@ void richtung_computer( vector <Spieler> &spieler, Punkte &punkte )
 }
 
 
-void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, unsigned long long zaehler )
+void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, unsigned long long zaehler, time_t t )
 {
     for( unsigned int s = 0; s < spieler.size(); s ++ )
     {
@@ -599,7 +599,7 @@ void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, u
 
         else
         {
-            spieler_bewegen( spielfeld, spieler, punkte, zaehler, s );
+            spieler_bewegen( spielfeld, spieler, punkte, zaehler, s, t );
         }
 
         gebaeude( spieler, s );
@@ -637,19 +637,19 @@ void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, u
         zufall = rand() % 2 ;
         if( zufall == 0 )
         {
-            punkte_erstellen( punkte.geld, spielfeld, spieler );
+            punkte_erstellen( punkte.geld, spielfeld, spieler, t );
             punkte_zeichnen( punkte.geld );
         }
         else if( zufall == 1 )
         {
-            punkte_erstellen( punkte.leben, spielfeld, spieler );
+            punkte_erstellen( punkte.leben, spielfeld, spieler, t );
             punkte_zeichnen( punkte.leben );
         }
     }
 }
 
 
-void spieler_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, unsigned long long zaehler, unsigned int s )
+void spieler_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, unsigned long long zaehler, unsigned int s, time_t t )
 {
     bool gebaeude = false;
     unsigned int sp;
@@ -803,7 +803,7 @@ void spieler_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &p
             gotoXY( spielfeld.groesse.x / spieler.size() * s + 8, spielfeld.groesse.y + 5 );
             cout << spieler.at(s).geld << " EURO";
 
-            punkte_erstellen( punkte.essen, spielfeld, spieler );
+            punkte_erstellen( punkte.essen, spielfeld, spieler, t );
             punkte_zeichnen( punkte.essen );
         }
 
@@ -840,8 +840,6 @@ void gebaeude( vector <Spieler> &spieler, unsigned int s )
 
         spieler.at(s).punkt.at( spieler.at(s).punkt.size() - 1 ).pos.x = ( spieler.at(s).gebaeude.at(1).start_pos.x + spieler.at(s).gebaeude.at(1).ende_pos.x ) / 2;
         spieler.at(s).punkt.at( spieler.at(s).punkt.size() - 1 ).pos.y = ( spieler.at(s).gebaeude.at(1).start_pos.y + spieler.at(s).gebaeude.at(1).ende_pos.y ) / 2;
-
-        spieler.at(s).punkt.at( spieler.at(s).punkt.size() - 1 ).farbe = spieler.at(s).farbe.at(0);
 
         unsigned int zufall = rand() % 4;
 
@@ -902,7 +900,7 @@ void punkte_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned i
                 spieler.at(s).punkt.at(i).pos.y --;
             }
 
-            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(s).farbe.at(0));
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(s).farbe.at(1));
             gotoXY( spieler.at(s).punkt.at(i).pos.x, spieler.at(s).punkt.at(i).pos.y );
             cout << ' ';
 
@@ -949,9 +947,10 @@ void spieler_menue( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned in
         {
             v = true;
 
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe.spielfeld);
+
             for( unsigned int y = spieler.at(s).gebaeude.at(i).start_pos.y; y <= spieler.at(s).gebaeude.at(i).ende_pos.y; y ++ )
             {
-                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe.spielfeld);
                 gotoXY( spieler.at(s).gebaeude.at(i).start_pos.x, y );
 
                 for( unsigned int x = spieler.at(s).gebaeude.at(i).start_pos.x; x <= spieler.at(s).gebaeude.at(i).ende_pos.x; x ++ )
@@ -1067,7 +1066,7 @@ void spieler_menue( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned in
     spieler.at(s).schlange.richtung = ' ';
 }
 
-void menue_pause( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte )
+void menue_pause( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, time_t t )
 {
     system( "cls" );
 
@@ -1084,17 +1083,17 @@ void menue_pause( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkt
     switch( getch() )
     {
     case'1':
-        spiel( spielfeld, spieler, punkte );
+        spiel( spielfeld, spieler, punkte, t );
         break;
 
     case'4':
-        menue_cheats( spielfeld, spieler, punkte );
+        menue_cheats( spielfeld, spieler, punkte, t );
         break;
     }
 }
 
 
-void menue_cheats( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte )
+void menue_cheats( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, time_t t )
 {
     system("cls");
 
@@ -1122,7 +1121,7 @@ void menue_cheats( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punk
         Sleep(800);
     }
 
-    spiel( spielfeld, spieler, punkte );
+    spiel( spielfeld, spieler, punkte, t );
 }
 
 
@@ -1256,6 +1255,7 @@ void farben()
 
 int main()
 {
+
     char wiederholen = '2';
 
     system( "color 84" );
@@ -1263,6 +1263,11 @@ int main()
     Spielfeld spielfeld;
     Punkte punkte;
     vector <Spieler> spieler;
+
+    time_t t;
+
+    time(&t);
+    srand(( unsigned int )t );
 
     do
     {
@@ -1297,26 +1302,26 @@ int main()
 
         for( unsigned int i = 0; i < spieler.size(); i ++ )
         {
-            spieler.at(i).gebaeude.resize(5);
+            spieler.at(i).gebaeude.resize(50);
 
-            spieler.at(i).gebaeude.at(0).name = "BAUPLATZ         ";
+            spieler.at(i).gebaeude.at(0).name = "BAUPLATZ";
 
-            spieler.at(i).gebaeude.at(1).name = "KANONE           ";
+            spieler.at(i).gebaeude.at(1).name = "KANONE";
             spieler.at(i).gebaeude.at(1).kosten = 1000;
             spieler.at(i).gebaeude.at(1).start_pos.x = spielfeld.groesse.x / 2;
             spieler.at(i).gebaeude.at(1).start_pos.y = spielfeld.groesse.y / 2;
             spieler.at(i).gebaeude.at(1).ende_pos.x = spieler.at(i).gebaeude.at(1).start_pos.x + 4;
             spieler.at(i).gebaeude.at(1).ende_pos.y = spieler.at(i).gebaeude.at(1).start_pos.y + 4;
 
-            spieler.at(i).gebaeude.at(2).name = "KRANKENHAUS      ";
+            spieler.at(i).gebaeude.at(2).name = "KRANKENHAUS";
             spieler.at(i).gebaeude.at(2).kosten = 1500;
             spieler.at(i).gebaeude.at(2).start_pos.x = spielfeld.groesse.x / 2;
             spieler.at(i).gebaeude.at(2).start_pos.y = spielfeld.groesse.y / 2;
-            spieler.at(i).gebaeude.at(2).ende_pos.x = spieler.at(i).gebaeude.at(2).start_pos.x + 9;
-            spieler.at(i).gebaeude.at(2).ende_pos.y = spieler.at(i).gebaeude.at(2).start_pos.y + 9;
+            spieler.at(i).gebaeude.at(2).ende_pos.x = spieler.at(i).gebaeude.at(2).start_pos.x + 8;
+            spieler.at(i).gebaeude.at(2).ende_pos.y = spieler.at(i).gebaeude.at(2).start_pos.y + 8;
 
-            spieler.at(i).gebaeude.at(3).name = "GELDLAGER        ";
-            spieler.at(i).gebaeude.at(3).kosten = 1000;
+            spieler.at(i).gebaeude.at(3).name = "GELDLAGER";
+            spieler.at(i).gebaeude.at(3).kosten = 600;
             spieler.at(i).gebaeude.at(3).start_pos.x = spielfeld.groesse.x / 2;
             spieler.at(i).gebaeude.at(3).start_pos.y = spielfeld.groesse.y / 2;
             spieler.at(i).gebaeude.at(3).ende_pos.x = spieler.at(i).gebaeude.at(3).start_pos.x + 11;
@@ -1343,7 +1348,7 @@ int main()
             spielfeld.seite_menue.at(100).naechste_seite = 1000;
         }
 
-        ifstream datei( "spieler.txt" );
+        ifstream datei( "spieler2.txt" );
 
         for( unsigned int i = 0; i < spieler.size(); i ++ )
         {
@@ -1447,10 +1452,10 @@ int main()
             spieler.at(i).schlange.zeit.pause = 50;
         }
 
-        punkte_erstellen( punkte.essen, spielfeld, spieler );
-        punkte_erstellen( punkte.hindernis, spielfeld, spieler );
+        punkte_erstellen( punkte.essen, spielfeld, spieler, t );
+        punkte_erstellen( punkte.hindernis, spielfeld, spieler, t );
 
-        spiel( spielfeld, spieler, punkte );
+        spiel( spielfeld, spieler, punkte, t );
 
 
 
