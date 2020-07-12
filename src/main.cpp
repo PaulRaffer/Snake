@@ -4,7 +4,6 @@
 #include <windows.h>
 #include <display.h>
 #include <stdlib.h>
-#include <time.h>
 
 
 using namespace std;
@@ -30,7 +29,7 @@ typedef struct
     bool
     cheats = true,
     diagonal_fahren = false,
-    waende = true,
+    waende = false,
 
     gameover = false;
 
@@ -87,6 +86,7 @@ typedef struct
 typedef struct
 {
     Koordinaten position;
+    int farbe = 450;
 
 } Essen;
 
@@ -95,36 +95,38 @@ typedef struct
 void eingaben();
 
 void spielfeld_erstellen( Spielfeld &spielfeld );
-void essen_erstellen( Essen &essen, Spielfeld &spielfeld, Spieler &spieler );
-void schlange_bewegen( Essen &essen, Spielfeld &spielfeld, Spieler &spieler, Spieler &gegner );
+void essen_erstellen( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler );
+void schlange_bewegen( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler, Spieler &gegner );
 
-char spieler_bewegen( Essen &essen, Spielfeld &spielfeld, Spieler &spieler, Spieler &gegner );
-void gegner_bewegen( Essen &essen, Spielfeld &spielfeld, Spieler &spieler, Spieler &gegner );
-bool richtung_ueberpruefen( Spieler &spieler );
+void spieler_bewegen( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler, Spieler &gegner );
+void gegner_bewegen( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler, Spieler &gegner );
+bool richtung_ueberpruefen( vector <Spieler> &spieler );
 
-void menue_pause( Essen &essen, Spielfeld &spielfeld, Spieler &spieler, Spieler &gegner );
-void menue_shop( Essen &essen, Spielfeld &spielfeld, Spieler &spieler, Spieler &gegner );
-void menue_cheats( Essen &essen, Spielfeld &spielfeld, Spieler &spieler, Spieler &gegner );
+void menue_pause( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler, Spieler &gegner );
+void menue_shop( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler, Spieler &gegner );
+void menue_cheats( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler, Spieler &gegner );
 
-void einstellungen( Essen &essen, Spielfeld &spielfeld, Spieler &spieler, Spieler &gegner );
+void einstellungen( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler, Spieler &gegner );
 
-bool gameover( Spielfeld &spielfeld, Spieler &spieler, Spieler &gegner );
+bool gameover( Spielfeld &spielfeld, vector <Spieler> &spieler, Spieler &gegner );
 
-void spiel( Essen &essen, Spielfeld &spielfeld, Spieler &spieler, Spieler &gegner );
+void spiel( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler, Spieler &gegner );
 
 
 
-void eingaben( Spielfeld &spielfeld, Spieler &spieler, Spieler &gegner )
+void eingaben( Spielfeld &spielfeld, vector <Spieler> &spieler, Spieler &gegner )
 {
     cout << "Spielfeldgroesse:";
 
     cout << "\nX: ";
     cin >> spielfeld.groesse.x;
-    spieler.position.at(0).x = spielfeld.groesse.x / 2 + 1;
+    spieler.at(1).position.at(0).x = spielfeld.groesse.x / 2 + 1;
+    spieler.at(2).position.at(0).x = spielfeld.groesse.x / 2 + 11;
 
     cout << "Y: ";
     cin >> spielfeld.groesse.y;
-    spieler.position.at(0).y = spielfeld.groesse.y / 2 + 1;
+    spieler.at(1).position.at(0).y = spielfeld.groesse.y / 2 + 1;
+    spieler.at(2).position.at(0).x = spielfeld.groesse.x / 2 + 11;
 
     gegner.position.at(0).x = 10;
     gegner.position.at(0).y = 10;
@@ -164,51 +166,50 @@ void spielfeld_erstellen( Spielfeld &spielfeld )
     cout << "\nPunkte:\t\t\t";
 }
 
-void essen_erstellen( Essen &essen, Spielfeld &spielfeld, Spieler &spieler )
+void essen_erstellen( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler )
 {
-    time_t t;
-
     bool wiederholen;
-
-    time(&t);
-    srand((unsigned int)t);
 
     do
     {
         wiederholen = false;
 
-        essen.position.x = ( "%d ", rand() % spielfeld.groesse.x + 1 );
-        essen.position.y = ( "%d ", rand() % spielfeld.groesse.y + 1 );
+        essen.position.x = rand() % spielfeld.groesse.x + 1;
+        essen.position.y = rand() % spielfeld.groesse.y + 1;
 
-        for(int i; i < spieler.informationen.laenge; i++)
+        for(int s = 0; s < spieler.size(); s ++)
         {
-            if(( essen.position.x == spieler.position.at(i).x ) && ( essen.position.y == spieler.position.at(i).y ))
+            for(int i; i < spieler.at(s).informationen.laenge; i++)
             {
-                wiederholen = true;
+                if((( essen.position.x == spieler.at(s).position.at(i).x ) && ( essen.position.y == spieler.at(s).position.at(i).y ))
+                {
+                    wiederholen = true;
+                }
             }
         }
     }
     while( wiederholen == true );
 
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), essen.farbe);
     gotoXY(essen.position.x, essen.position.y);
-    cout << 'x';
+    cout << ' ';
 }
 
-void schlange_bewegen( Essen &essen, Spielfeld &spielfeld, Spieler &spieler, Spieler &gegner )
+void schlange_bewegen( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler, Spieler &gegner )
 {
     do
     {
-        spieler.informationen.richtung = spieler_bewegen( essen, spielfeld, spieler, gegner );
+        spieler_bewegen( essen, spielfeld, spieler, gegner );
         gegner_bewegen( essen, spielfeld, spieler, gegner );
 
-        if((spieler.position.at(0).x == essen.position.x) && (spieler.position.at(0).y == essen.position.y))
+        if((spieler.at(1).position.at(0).x == essen.position.x) && (spieler.at(1).position.at(0).y == essen.position.y))
         {
-            spieler.informationen.punkte ++;
+            spieler.at(1).informationen.punkte ++;
             gotoXY( 8, spielfeld.groesse.y + 2 );
-            cout << spieler.informationen.punkte;
+            cout << spieler.at(1).informationen.punkte;
 
-            spieler.informationen.laenge ++;
-            spieler.position.resize( spieler.informationen.laenge );
+            spieler.at(1).informationen.laenge ++;
+            spieler.at(1).position.resize( spieler.at(1).informationen.laenge );
 
             essen_erstellen( essen, spielfeld, spieler );
         }
@@ -222,189 +223,191 @@ void schlange_bewegen( Essen &essen, Spielfeld &spielfeld, Spieler &spieler, Spi
             gegner.informationen.laenge ++;
             gegner.position.resize( gegner.informationen.laenge );
 
-            essen_erstellen( essen, spielfeld, gegner );
+            essen_erstellen( essen, spielfeld, spieler );
         }
     }
     while( gameover( spielfeld, spieler, gegner ) == false );
 }
 
-char spieler_bewegen( Essen &essen, Spielfeld &spielfeld, Spieler &spieler, Spieler &gegner )
+void spieler_bewegen( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler, Spieler &gegner )
 {
-    bool wiederholen;
-    spieler.informationen.richtung_alt = spieler.informationen.richtung;
 
-    for( int i = 0; i < spieler.informationen.laenge; i ++ )
+    for( int s = 0; s < spieler.size(); s ++ )
     {
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.informationen.farbe.at(i % spieler.informationen.farbe.size()));
-        gotoXY( spieler.position.at(i).x, spieler.position.at(i).y );
+        bool wiederholen;
+        spieler.at(1).informationen.richtung_alt = spieler.at(1).informationen.richtung;
+
+        for( int i = 0; i < spieler.at(1).informationen.laenge; i ++ )
+        {
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(1).informationen.farbe.at(i % spieler.at(1).informationen.farbe.size()));
+            gotoXY( spieler.at(1).position.at(i).x, spieler.at(1).position.at(i).y );
+            cout << ' ';
+        }
+
+        if( spielfeld.ton == true )
+        {
+            Beep(1350, 100);
+        }
+
+        else if( spielfeld.ton == false )
+        {
+            Sleep(100 / spieler.size());
+        }
+
+        if(kbhit())
+        {
+            spieler.at(1).informationen.richtung = getch();
+        }
+
+        if( richtung_ueberpruefen( spieler ) == false )
+        {
+            spieler.at(1).informationen.richtung = spieler.at(1).informationen.richtung_alt;
+        }
+
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe_spielfeld);
+        gotoXY(spieler.at(1).position.at(spieler.at(1).informationen.laenge - 1).x, spieler.at(1).position.at(spieler.at(1).informationen.laenge - 1).y);
         cout << ' ';
-    }
 
-    if( spielfeld.ton == true )
-    {
-        Beep(1350, 100);
-
-    }
-
-    else if( spielfeld.ton == false )
-    {
-        Sleep(100);
-    }
-
-    if(kbhit())
-    {
-        spieler.informationen.richtung = getch();
-    }
-
-    if( richtung_ueberpruefen( spieler ) == false )
-    {
-        spieler.informationen.richtung = spieler.informationen.richtung_alt;
-    }
-
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe_spielfeld);
-    gotoXY(spieler.position.at(spieler.informationen.laenge - 1).x, spieler.position.at(spieler.informationen.laenge - 1).y);
-    cout << ' ';
-
-    for( int i = spieler.informationen.laenge - 1; i > 0; i -- )
-    {
-        spieler.position.at(i).x = spieler.position.at(i - 1).x;
-        spieler.position.at(i).y = spieler.position.at(i - 1).y;
-    }
-
-    do
-    {
-        wiederholen = false;
-
-        if( spieler.informationen.richtung == spieler.tasten.oben )
+        for( int i = spieler.at(1).informationen.laenge - 1; i > 0; i -- )
         {
-            spieler.position.at(0).y --;
+            spieler.at(1).position.at(i).x = spieler.at(1).position.at(i - 1).x;
+            spieler.at(1).position.at(i).y = spieler.at(1).position.at(i - 1).y;
         }
 
-        else if( spieler.informationen.richtung == spieler.tasten.unten )
+        do
         {
-            spieler.position.at(0).y ++;
-        }
+            wiederholen = false;
 
-        else if( spieler.informationen.richtung == spieler.tasten.links )
-        {
-            spieler.position.at(0).x --;
-        }
-
-        else if( spieler.informationen.richtung == spieler.tasten.rechts )
-        {
-            spieler.position.at(0).x ++;
-        }
-
-        else if(spieler.informationen.richtung == spieler.tasten.beenden)
-        {
-            return 0;
-        }
-
-        else if( spieler.informationen.richtung == spieler.tasten.menue_pause )
-        {
-            spieler.informationen.richtung = spieler.informationen.richtung_alt;
-            menue_pause( essen, spielfeld, spieler, gegner );
-        }
-
-        else if( spieler.informationen.richtung == spieler.tasten.menue_shop )
-        {
-            spieler.informationen.richtung = spieler.informationen.richtung_alt;
-            menue_shop( essen, spielfeld, spieler, gegner );
-        }
-
-        else if(( spieler.informationen.richtung == spieler.tasten.menue_cheats ))
-        {
-            spieler.informationen.richtung = spieler.informationen.richtung_alt;
-            menue_cheats( essen, spielfeld, spieler, gegner );
-        }
-
-        else if( spieler.informationen.diagonal_fahren == true )
-        {
-            if( spieler.informationen.richtung == spieler.tasten.oben_links )
+            if( spieler.at(1).informationen.richtung == spieler.at(1).tasten.oben )
             {
-                spieler.position.at(0).y --;
-                spieler.position.at(0).x --;
+                spieler.at(1).position.at(0).y --;
             }
 
-            else if( spieler.informationen.richtung == spieler.tasten.oben_rechts )
+            else if( spieler.at(1).informationen.richtung == spieler.at(1).tasten.unten )
             {
-                spieler.position.at(0).y --;
-                spieler.position.at(0).x ++;
+                spieler.at(1).position.at(0).y ++;
             }
 
-            else if( spieler.informationen.richtung == spieler.tasten.unten_links )
+            else if( spieler.at(1).informationen.richtung == spieler.at(1).tasten.links )
             {
-                spieler.position.at(0).y ++;
-                spieler.position.at(0).x --;
+                spieler.at(1).position.at(0).x --;
             }
 
-            else if( spieler.informationen.richtung == spieler.tasten.unten_rechts )
+            else if( spieler.at(1).informationen.richtung == spieler.at(1).tasten.rechts )
             {
-                spieler.position.at(0).y ++;
-                spieler.position.at(0).x ++;
+                spieler.at(1).position.at(0).x ++;
+            }
+
+            else if(spieler.at(1).informationen.richtung == spieler.at(1).tasten.beenden)
+            {
+
+            }
+
+            else if( spieler.at(1).informationen.richtung == spieler.at(1).tasten.menue_pause )
+            {
+                spieler.at(1).informationen.richtung = spieler.at(1).informationen.richtung_alt;
+                menue_pause( essen, spielfeld, spieler, gegner );
+            }
+
+            else if( spieler.at(1).informationen.richtung == spieler.at(1).tasten.menue_shop )
+            {
+                spieler.at(1).informationen.richtung = spieler.at(1).informationen.richtung_alt;
+                menue_shop( essen, spielfeld, spieler, gegner );
+            }
+
+            else if(( spieler.at(1).informationen.richtung == spieler.at(1).tasten.menue_cheats ))
+            {
+                spieler.at(1).informationen.richtung = spieler.at(1).informationen.richtung_alt;
+                menue_cheats( essen, spielfeld, spieler, gegner );
+            }
+
+            else if( spieler.at(1).informationen.diagonal_fahren == true )
+            {
+                if( spieler.at(1).informationen.richtung == spieler.at(1).tasten.oben_links )
+                {
+                    spieler.at(1).position.at(0).y --;
+                    spieler.at(1).position.at(0).x --;
+                }
+
+                else if( spieler.at(1).informationen.richtung == spieler.at(1).tasten.oben_rechts )
+                {
+                    spieler.at(1).position.at(0).y --;
+                    spieler.at(1).position.at(0).x ++;
+                }
+
+                else if( spieler.at(1).informationen.richtung == spieler.at(1).tasten.unten_links )
+                {
+                    spieler.at(1).position.at(0).y ++;
+                    spieler.at(1).position.at(0).x --;
+                }
+
+                else if( spieler.at(1).informationen.richtung == spieler.at(1).tasten.unten_rechts )
+                {
+                    spieler.at(1).position.at(0).y ++;
+                    spieler.at(1).position.at(0).x ++;
+                }
+
+                else
+                {
+                    do
+                    {
+                        spieler.at(1).informationen.richtung = 'x';
+                        wiederholen = true;
+                        spieler.at(1).informationen.richtung = getch();
+                    }
+                    while( richtung_ueberpruefen( spieler ) == false);
+                }
             }
 
             else
             {
                 do
                 {
-                    spieler.informationen.richtung = 'x';
+                    spieler.at(1).informationen.richtung = 'x';
                     wiederholen = true;
-                    spieler.informationen.richtung = getch();
+                    spieler.at(1).informationen.richtung = getch();
                 }
-                while( richtung_ueberpruefen( spieler ) == false);
+                while( richtung_ueberpruefen( spieler ) == false );
+            }
+
+            if( spieler.at(1).informationen.waende == false )
+            {
+                if( spieler.at(1).position.at(0).y == 0)
+                {
+                    spieler.at(1).position.at(0).y = spielfeld.groesse.y;
+                }
+
+                if( spieler.at(1).position.at(0).y == spielfeld.groesse.y + 1)
+                {
+                    spieler.at(1).position.at(0).y = 1;
+                }
+
+                if( spieler.at(1).position.at(0).x == 0)
+                {
+                    spieler.at(1).position.at(0).x = spielfeld.groesse.x;
+                }
+
+                if( spieler.at(1).position.at(0).x == spielfeld.groesse.x + 1)
+                {
+                    spieler.at(1).position.at(0).x = 1;
+                }
             }
         }
-
-        else
-        {
-            do
-            {
-                spieler.informationen.richtung = 'x';
-                wiederholen = true;
-                spieler.informationen.richtung = getch();
-            }
-            while( richtung_ueberpruefen( spieler ) == false );
-        }
-
-        if( spieler.informationen.waende == false )
-        {
-            if( spieler.position.at(0).y == 0)
-            {
-                spieler.position.at(0).y = spielfeld.groesse.y;
-            }
-
-            if( spieler.position.at(0).y == spielfeld.groesse.y + 1)
-            {
-                spieler.position.at(0).y = 1;
-            }
-
-            if( spieler.position.at(0).x == 0)
-            {
-                spieler.position.at(0).x = spielfeld.groesse.x;
-            }
-
-            if( spieler.position.at(0).x == spielfeld.groesse.x + 1)
-            {
-                spieler.position.at(0).x = 1;
-            }
-        }
+        while( wiederholen == true );
     }
-    while( wiederholen == true );
 
-    return spieler.informationen.richtung;
 }
 
-bool richtung_ueberpruefen( Spieler &spieler )
+bool richtung_ueberpruefen( vector <Spieler> &spieler )
 {
-    if(((spieler.informationen.richtung_alt == spieler.tasten.oben) && (spieler.informationen.richtung == spieler.tasten.unten))
-    || ((spieler.informationen.richtung_alt == spieler.tasten.unten) && (spieler.informationen.richtung == spieler.tasten.oben))
-    || ((spieler.informationen.richtung_alt == spieler.tasten.links) && (spieler.informationen.richtung == spieler.tasten.rechts))
-    || ((spieler.informationen.richtung_alt == spieler.tasten.rechts) && (spieler.informationen.richtung == spieler.tasten.links))
-    || ((spieler.informationen.richtung_alt == spieler.tasten.oben_links) && (spieler.informationen.richtung == spieler.tasten.unten_rechts))
-    || ((spieler.informationen.richtung_alt == spieler.tasten.unten_rechts) && (spieler.informationen.richtung == spieler.tasten.oben_links))
-    || ((spieler.informationen.richtung_alt == spieler.tasten.unten_links) && (spieler.informationen.richtung == spieler.tasten.oben_rechts))
-    || ((spieler.informationen.richtung_alt == spieler.tasten.oben_rechts) && (spieler.informationen.richtung == spieler.tasten.unten_links)))
+    if(((spieler.at(1).informationen.richtung_alt == spieler.at(1).tasten.oben) && (spieler.at(1).informationen.richtung == spieler.at(1).tasten.unten))
+    || ((spieler.at(1).informationen.richtung_alt == spieler.at(1).tasten.unten) && (spieler.at(1).informationen.richtung == spieler.at(1).tasten.oben))
+    || ((spieler.at(1).informationen.richtung_alt == spieler.at(1).tasten.links) && (spieler.at(1).informationen.richtung == spieler.at(1).tasten.rechts))
+    || ((spieler.at(1).informationen.richtung_alt == spieler.at(1).tasten.rechts) && (spieler.at(1).informationen.richtung == spieler.at(1).tasten.links))
+    || ((spieler.at(1).informationen.richtung_alt == spieler.at(1).tasten.oben_links) && (spieler.at(1).informationen.richtung == spieler.at(1).tasten.unten_rechts))
+    || ((spieler.at(1).informationen.richtung_alt == spieler.at(1).tasten.unten_rechts) && (spieler.at(1).informationen.richtung == spieler.at(1).tasten.oben_links))
+    || ((spieler.at(1).informationen.richtung_alt == spieler.at(1).tasten.unten_links) && (spieler.at(1).informationen.richtung == spieler.at(1).tasten.oben_rechts))
+    || ((spieler.at(1).informationen.richtung_alt == spieler.at(1).tasten.oben_rechts) && (spieler.at(1).informationen.richtung == spieler.at(1).tasten.unten_links)))
     {
         return false;
     }
@@ -415,7 +418,7 @@ bool richtung_ueberpruefen( Spieler &spieler )
     }
 }
 
-void gegner_bewegen( Essen &essen, Spielfeld &spielfeld, Spieler &spieler, Spieler &gegner )
+void gegner_bewegen( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler, Spieler &gegner )
 {
     for( int i = 0; i < gegner.informationen.laenge; i ++ )
     {
@@ -433,36 +436,6 @@ void gegner_bewegen( Essen &essen, Spielfeld &spielfeld, Spieler &spieler, Spiel
         gegner.position.at(i).x = gegner.position.at(i - 1).x;
         gegner.position.at(i).y = gegner.position.at(i - 1).y;
     }
-
-    bool
-    spieler_oben = false,
-    spieler_unten = false,
-    spieler_links = false,
-    spieler_rechts = false;
-
-    for( int i = 0; i < spieler.informationen.laenge; i ++ )
-    {
-        if(( gegner.position.at(0).y - 1 == spieler.position.at(i).y ) && ( gegner.position.at(0).x == spieler.position.at(i).x ))
-        {
-            spieler_oben = true;
-        }
-
-        if(( gegner.position.at(0).y + 1 == spieler.position.at(i).y ) && ( gegner.position.at(0).x == spieler.position.at(i).x ))
-        {
-            spieler_unten = true;
-        }
-
-        if(( gegner.position.at(0).x - 1 == spieler.position.at(i).x ) && ( gegner.position.at(0).y == spieler.position.at(i).y ))
-        {
-            spieler_links = true;
-        }
-
-        if(( gegner.position.at(0).x + 1 == spieler.position.at(i).x ) && ( gegner.position.at(0).y == spieler.position.at(i).y ))
-        {
-            spieler_rechts = true;
-        }
-    }
-
 
     if(( gegner.position.at(0).y > essen.position.y ) && ( gegner.informationen.richtung != 's' ))
     {
@@ -489,7 +462,7 @@ void gegner_bewegen( Essen &essen, Spielfeld &spielfeld, Spieler &spieler, Spiel
     }
 }
 
-void menue_pause( Essen &essen, Spielfeld &spielfeld, Spieler &spieler, Spieler &gegner )
+void menue_pause( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler, Spieler &gegner )
 {
     system("cls");
 
@@ -522,62 +495,112 @@ void menue_pause( Essen &essen, Spielfeld &spielfeld, Spieler &spieler, Spieler 
     }
 }
 
-void menue_shop( Essen &essen, Spielfeld &spielfeld, Spieler &spieler, Spieler &gegner )
+void menue_shop( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler, Spieler &gegner )
 {
     cout << "SHOP\n\n";
 }
 
-void menue_cheats( Essen &essen, Spielfeld &spielfeld, Spieler &spieler, Spieler &gegner )
+void menue_cheats( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler, Spieler &gegner )
 {
     system("cls");
 
-    if( spieler.informationen.cheats == true )
+    if( spieler.at(1).informationen.cheats == true )
     {
         string cheat;
 
         cout << "CHEATS\n\n";
         cin >> cheat;
 
-        if( cheat == "beenden" )
+        if( cheat == "spieler" )
         {
+            cin >> cheat;
 
-        }
+            if( cheat == "name" )
+            {
+                cin >> spieler.at(1).informationen.name;
+            }
 
-        else if( cheat == "teleportieren" )
-        {
-            cin >> spieler.position.at(0).x >> spieler.position.at(0).y;
-        }
 
-        else if( cheat == "richtung" )
-        {
-            cin >> spieler.informationen.richtung;
-        }
 
-        else if( cheat == "laenge" )
-        {
-            cin >> spieler.informationen.laenge;
-            spieler.position.resize( spieler.informationen.laenge );
-        }
+            else if( cheat == "cheats" )
+            {
+                cin >> spieler.at(1).informationen.cheats;
+            }
 
-        else if( cheat == "punkte" )
-        {
-            cin >> spieler.informationen.punkte;
-        }
+            else if( cheat == "diagonal_fahren" )
+            {
+                cin >> spieler.at(1).informationen.diagonal_fahren;
+            }
 
-        else if( cheat == "geld" )
-        {
-            cin >> spieler.informationen.geld;
+            else if( cheat == "waende" )
+            {
+                cin >> spieler.at(1).informationen.waende;
+            }
+
+
+
+            else if( cheat == "laenge" )
+            {
+                cin >> spieler.at(1).informationen.laenge;
+                spieler.at(1).position.resize( spieler.at(1).informationen.laenge );
+            }
+
+            else if( cheat == "richtung" )
+            {
+                cin >> spieler.at(1).informationen.richtung;
+            }
+
+            else if( cheat == "teleportieren" )
+            {
+                cin >> spieler.at(1).position.at(0).x >> spieler.at(1).position.at(0).y;
+            }
+
+
+
+            else if( cheat == "punkte" )
+            {
+                cin >> spieler.at(1).informationen.punkte;
+            }
+
+            else if( cheat == "geld" )
+            {
+                cin >> spieler.at(1).informationen.geld;
+            }
         }
 
         else if( cheat == "spielfeld" )
         {
-            cin >> spielfeld.groesse.x >> spielfeld.groesse.y;
+            cin >> cheat;
+
+            if( cheat == "groesse" )
+            {
+                cin >> spielfeld.groesse.x >> spielfeld.groesse.y;
+            }
+
+            else if( cheat == "farbe" )
+            {
+                cin >> cheat;
+
+                if( cheat == "spielfeld" )
+                {
+                    cin >> spielfeld.farbe_spielfeld;
+                }
+
+                else if( cheat == "wand" )
+                {
+                    cin >> spielfeld.farbe_wand;
+                }
+            }
+
+            else if( cheat == "ton" )
+            {
+                cin >> spielfeld.ton;
+            }
         }
 
         else
         {
-            cout << cheat << " WURDE NICHT ERKANNT!";
-            Sleep(800);
+            cout << "falsche Eingebe!";
         }
     }
 
@@ -590,11 +613,11 @@ void menue_cheats( Essen &essen, Spielfeld &spielfeld, Spieler &spieler, Spieler
     spiel( essen, spielfeld, spieler, gegner );
 }
 
-void einstellungen( Essen &essen, Spielfeld &spielfeld, Spieler &spieler, Spieler &gegner )
+void einstellungen( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler, Spieler &gegner )
 {
     system("cls");
 
-    cout << "EINSTELLUNGEN\n\nCHEATS\t\t" << spieler.informationen.cheats << "\nDIAGONAL FAHREN\t" << spieler.informationen.diagonal_fahren << "\nWAENDE\t\t" << spieler.informationen.waende;
+    cout << "EINSTELLUNGEN\n\nCHEATS\t\t" << spieler.at(1).informationen.cheats << "\nDIAGONAL FAHREN\t" << spieler.at(1).informationen.diagonal_fahren << "\nWAENDE\t\t" << spieler.at(1).informationen.waende;
     /*
         EINSTELLUNGEN
 
@@ -604,26 +627,26 @@ void einstellungen( Essen &essen, Spielfeld &spielfeld, Spieler &spieler, Spiele
     */
 }
 
-bool gameover( Spielfeld &spielfeld, Spieler &spieler, Spieler &gegner )
+bool gameover( Spielfeld &spielfeld, vector <Spieler> &spieler, Spieler &gegner )
 {
     bool gameover = false;
 
-    if( (spieler.informationen.waende == true) && ((spieler.position.at(0).x == 0) || (spieler.position.at(0).y == 0) || (spieler.position.at(0).x == spielfeld.groesse.x + 1) || (spieler.position.at(0).y == spielfeld.groesse.y + 1)) )
+    if( (spieler.at(1).informationen.waende == true) && ((spieler.at(1).position.at(0).x == 0) || (spieler.at(1).position.at(0).y == 0) || (spieler.at(1).position.at(0).x == spielfeld.groesse.x + 1) || (spieler.at(1).position.at(0).y == spielfeld.groesse.y + 1)) )
     {
         gameover = true;
     }
 
     for( int i = 0; i < gegner.informationen.laenge; i ++ )
     {
-        if(( spieler.position.at(0).x == gegner.position.at(i).x ) && ( spieler.position.at(0).y == gegner.position.at(i).y ))
+        if(( spieler.at(1).position.at(0).x == gegner.position.at(i).x ) && ( spieler.at(1).position.at(0).y == gegner.position.at(i).y ))
         {
             gameover = true;
         }
     }
 
-    for(int i = 1; i < spieler.informationen.laenge; i ++)
+    for(int i = 1; i < spieler.at(1).informationen.laenge; i ++)
     {
-        if((spieler.position.at(0).x == spieler.position.at(i).x) && (spieler.position.at(0).y == spieler.position.at(i).y))
+        if((spieler.at(1).position.at(0).x == spieler.at(1).position.at(i).x) && (spieler.at(1).position.at(0).y == spieler.at(1).position.at(i).y))
         {
             gameover = true;
         }
@@ -632,7 +655,7 @@ bool gameover( Spielfeld &spielfeld, Spieler &spieler, Spieler &gegner )
 return gameover;
 }
 
-void spiel( Essen &essen, Spielfeld &spielfeld, Spieler &spieler, Spieler &gegner )
+void spiel( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler, Spieler &gegner )
 {
     spielfeld_erstellen( spielfeld );
 
@@ -644,18 +667,25 @@ void spiel( Essen &essen, Spielfeld &spielfeld, Spieler &spieler, Spieler &gegne
 int main()
 {
     Spielfeld spielfeld;
-    Spieler spieler;
+    vector <Spieler> spieler;
     Spieler gegner;
     Essen essen;
 
-    spieler.position.resize( spieler.informationen.laenge );
+
+    spieler.resize( 2 );
+
+    spieler.at(1).position.resize( spieler.at(1).informationen.laenge );
+    spieler.at(1).informationen.farbe.resize( 2 );
+    spieler.at(1).informationen.farbe.at(0) = 200;
+    spieler.at(1).informationen.farbe.at(1) = 255;
+
+    /*spieler.at(2).position.resize( spieler.at(2).informationen.laenge );
+    spieler.at(2).informationen.farbe.resize( 2 );
+    spieler.at(2).informationen.farbe.at(0) = 0;
+    spieler.at(2).informationen.farbe.at(1) = 255;*/
+
     gegner.position.resize( gegner.informationen.laenge );
-    spieler.informationen.farbe.resize( 2 );
     gegner.informationen.farbe.resize( 2 );
-
-    spieler.informationen.farbe.at(0) = 200;
-    spieler.informationen.farbe.at(1) = 255;
-
     gegner.informationen.farbe.at(0) = 50;
     gegner.informationen.farbe.at(1) = 0;
 
