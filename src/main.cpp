@@ -181,7 +181,7 @@ void essen_erstellen( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spie
         {
             for(int i; i < spieler.at(s).informationen.laenge; i++)
             {
-                if((( essen.position.x == spieler.at(s).position.at(i).x ) && ( essen.position.y == spieler.at(s).position.at(i).y ))
+                if((( essen.position.x == spieler.at(s).position.at(i).x ) && ( essen.position.y == spieler.at(s).position.at(i).y )))
                 {
                     wiederholen = true;
                 }
