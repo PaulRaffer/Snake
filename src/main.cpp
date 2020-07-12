@@ -104,46 +104,46 @@ typedef struct
 typedef struct
 {
     Koordinaten position;
-    unsigned int farbe = 450;
+    unsigned int farbe = 50;
 
 } Punkt;
 
 
 
-int eingaben( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> hinderniss );
+int eingaben( Spielfeld &spielfeld, vector <Spieler> &spieler );
 
 
-void spiel( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &essen);
+void spiel( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &punkt);
 
 
 void spielfeld_erstellen( Spielfeld &spielfeld, vector <Spieler> &spieler );
-void punkt_erstellen( vector <Punkt> &punkt, Spielfeld &spielfeld, vector <Spieler> &spieler );
-void punkt_zeichnen( vector <Punkt> &punkt, Spielfeld &spielfeld, vector <Spieler> &spieler );
+void punkt_erstellen( vector <Punkt> &punkt, Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int k, unsigned int g );
+void punkt_zeichnen( vector <Punkt> &punkt, Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int k, unsigned int g );
 
-void richtung( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &essen );
+void richtung( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &punkt );
 void richtung_spieler( char richtung, vector <Spieler> &spieler );
-void richtung_computer( vector <Spieler> &spieler, vector <Punkt> &essen );
+void richtung_computer( vector <Spieler> &spieler, vector <Punkt> &punkt );
 
-void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &essen, unsigned long long zaehler );
-void spieler_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &essen, unsigned long long zaehler, unsigned int s );
+void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &punkt, unsigned long long zaehler );
+void spieler_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &punkt, unsigned long long zaehler, unsigned int s );
 
 void spieler_informationen( Spielfeld spielfeld, vector <Spieler> spieler, unsigned int s );
 void spieler_menue( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s );
 
 
-void menue_pause( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &essen );
-void menue_cheats( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &essen );
+void menue_pause( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &punkt );
+void menue_cheats( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &punkt );
 
 
 void leben( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s );
-bool gameover( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s );
+bool gameover( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &punkt, unsigned int s );
 
 
 void farben();
 
 
 
-int eingaben( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> hinderniss )
+int eingaben( Spielfeld &spielfeld, vector <Spieler> &spieler )
 {
     int s;
 
@@ -160,24 +160,24 @@ int eingaben( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> hi
 }
 
 
-void spiel( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &essen )
+void spiel( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &punkt )
 {
     bool wiederholen = true;
 
     spielfeld_erstellen( spielfeld, spieler );
 
-    punkt_zeichnen( essen, spielfeld, spieler );
+    punkt_zeichnen( punkt, spielfeld, spieler, 0, punkt.size() );
 
     for( unsigned int i = 0; i < spieler.size(); i ++ )
     {
         spieler_informationen( spielfeld, spieler, i );
     }
 
-    for( unsigned long long zaehler = 0; wiederholen == true; zaehler ++ )
+    for( static unsigned long long zaehler = 0; wiederholen == true; zaehler ++ )
     {
-        richtung( spielfeld, spieler, essen );
+        richtung( spielfeld, spieler, punkt );
 
-        bewegen( spielfeld, spieler, essen, zaehler );
+        bewegen( spielfeld, spieler, punkt, zaehler );
 
         wiederholen = true;
 
@@ -251,20 +251,24 @@ void spielfeld_erstellen( Spielfeld &spielfeld, vector <Spieler> &spieler )
 }
 
 
-void punkt_erstellen( vector <Punkt> &punkt, Spielfeld &spielfeld, vector <Spieler> &spieler )
+void punkt_erstellen( vector <Punkt> &punkt, Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int k, unsigned int g )
 {
     bool wiederholen;
 
-    for( unsigned int p = 0; p < punkt.size(); p ++ )
+    time_t t;
+
+
+
+    wiederholen = false;
+
+    time(&t);
+    srand(( unsigned int )t );
+
+    for( unsigned int p = k; p < g; p ++ )
     {
         do
         {
-            time_t t;
 
-            wiederholen = false;
-
-            time(&t);
-            srand(( unsigned int )t );
 
             punkt.at(p).position.x = rand() % spielfeld.groesse.x + 1;
             punkt.at(p).position.y = rand() % spielfeld.groesse.y + 1;
@@ -279,15 +283,25 @@ void punkt_erstellen( vector <Punkt> &punkt, Spielfeld &spielfeld, vector <Spiel
                     }
                 }
             }
+
+            for( unsigned int j = 0, wiederholen = false; j < p; j ++ )
+            {
+                if(( punkt.at(p).position.x == punkt.at(j).position.x ) && ( punkt.at(p).position.y == punkt.at(j).position.y ))
+                {
+                    wiederholen = true;
+                }
+            }
+
+
         }
         while( wiederholen == true );
     }
 }
 
 
-void punkt_zeichnen( vector <Punkt> &punkt, Spielfeld &spielfeld, vector <Spieler> &spieler )
+void punkt_zeichnen( vector <Punkt> &punkt, Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int k, unsigned int g )
 {
-    for( unsigned int p = 0; p < punkt.size(); p ++ )
+    for( unsigned int p = k; p < g; p ++ )
     {
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), punkt.at(p).farbe);
         gotoXY(punkt.at(p).position.x, punkt.at(p).position.y);
@@ -296,7 +310,7 @@ void punkt_zeichnen( vector <Punkt> &punkt, Spielfeld &spielfeld, vector <Spiele
 }
 
 
-void richtung( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &essen )
+void richtung( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &punkt )
 {
 
     if( spielfeld.ton == true )
@@ -320,18 +334,18 @@ void richtung( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &
 
         else if( richtung == spielfeld.menue_pause )
         {
-            menue_pause( spielfeld, spieler, essen );
+            menue_pause( spielfeld, spieler, punkt );
         }
 
         else if( richtung == spielfeld.menue_cheats )
         {
-            menue_cheats( spielfeld, spieler, essen );
+            menue_cheats( spielfeld, spieler, punkt );
         }
 
         richtung_spieler( richtung, spieler );
     }
 
-    richtung_computer( spieler, essen );
+    richtung_computer( spieler, punkt );
 }
 
 
@@ -373,28 +387,28 @@ void richtung_spieler( char richtung, vector <Spieler> &spieler )
 }
 
 
-void richtung_computer( vector <Spieler> &spieler, vector <Punkt> &essen )
+void richtung_computer( vector <Spieler> &spieler, vector <Punkt> &punkt )
 {
     for( unsigned int i = 0; i < spieler.size(); i ++ )
     {
         if( spieler.at(i).info.computer == true )
         {
-            if(( essen.at(0).position.y < spieler.at(i).position.at(0).y ) && ( spieler.at(i).info.richtung != spieler.at(i).tasten.unten ))
+            if(( punkt.at(0).position.y < spieler.at(i).position.at(0).y ) && ( spieler.at(i).info.richtung != spieler.at(i).tasten.unten ))
             {
                 spieler.at(i).info.richtung_neu = spieler.at(i).tasten.oben;
             }
 
-            else if(( essen.at(0).position.y > spieler.at(i).position.at(0).y ) && ( spieler.at(i).info.richtung != spieler.at(i).tasten.oben ))
+            else if(( punkt.at(0).position.y > spieler.at(i).position.at(0).y ) && ( spieler.at(i).info.richtung != spieler.at(i).tasten.oben ))
             {
                 spieler.at(i).info.richtung_neu = spieler.at(i).tasten.unten;
             }
 
-            else if(( essen.at(0).position.x < spieler.at(i).position.at(0).x ) && ( spieler.at(i).info.richtung != spieler.at(i).tasten.rechts ))
+            else if(( punkt.at(0).position.x < spieler.at(i).position.at(0).x ) && ( spieler.at(i).info.richtung != spieler.at(i).tasten.rechts ))
             {
                 spieler.at(i).info.richtung_neu = spieler.at(i).tasten.links;
             }
 
-            else if(( essen.at(0).position.x > spieler.at(i).position.at(0).x ) && ( spieler.at(i).info.richtung != spieler.at(i).tasten.links ))
+            else if(( punkt.at(0).position.x > spieler.at(i).position.at(0).x ) && ( spieler.at(i).info.richtung != spieler.at(i).tasten.links ))
             {
                 spieler.at(i).info.richtung_neu = spieler.at(i).tasten.rechts;
             }
@@ -403,7 +417,7 @@ void richtung_computer( vector <Spieler> &spieler, vector <Punkt> &essen )
 }
 
 
-void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &essen, unsigned long long zaehler )
+void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &punkt, unsigned long long zaehler )
 {
     for( unsigned int s = 0; s < spieler.size(); s ++ )
     {
@@ -426,7 +440,7 @@ void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &e
 
         if( spieler.at(s).info.menue == false )
         {
-            spieler_bewegen( spielfeld, spieler, essen, zaehler, s );
+            spieler_bewegen( spielfeld, spieler, punkt, zaehler, s );
         }
 
         if( spielfeld.cursor == false )
@@ -437,7 +451,7 @@ void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &e
 }
 
 
-void spieler_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &essen, unsigned long long zaehler, unsigned int s )
+void spieler_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &punkt, unsigned long long zaehler, unsigned int s )
 {
     unsigned int pause = zaehler % spieler.at(s).info.pause;
 
@@ -549,12 +563,12 @@ void spieler_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <P
             }
         }
 
-        spieler.at(s).info.gameover = gameover( spielfeld, spieler,  s );
+        spieler.at(s).info.gameover = gameover( spielfeld, spieler, punkt, s );
 
-        if(( spieler.at(s).position.at(0).x == essen.at(0).position.x ) && ( spieler.at(s).position.at(0).y == essen.at(0).position.y ))
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(s).info.farbe.at(0));
+
+        if(( spieler.at(s).position.at(0).x == punkt.at(0).position.x ) && ( spieler.at(s).position.at(0).y == punkt.at(0).position.y ))
         {
-            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(s).info.farbe.at(0));
-
             spieler.at(s).info.punkte ++;
             gotoXY( spielfeld.groesse.x / spieler.size() * s + 8, spielfeld.groesse.y + 3 );
             cout << spieler.at(s).info.punkte;
@@ -564,9 +578,37 @@ void spieler_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <P
             gotoXY( spielfeld.groesse.x / spieler.size() * s + 8, spielfeld.groesse.y + 4 );
             cout << spieler.at(s).info.laenge;
 
-            punkt_erstellen( essen, spielfeld, spieler );
-            punkt_zeichnen( essen, spielfeld, spieler );
+            spieler.at(s).info.geld += rand() % 11;
+            gotoXY( spielfeld.groesse.x / spieler.size() * s + 8, spielfeld.groesse.y + 5 );
+            cout << spieler.at(s).info.geld << " EURO";
+
+            punkt_erstellen( punkt, spielfeld, spieler, 0, 1 );
+            punkt_zeichnen( punkt, spielfeld, spieler, 0, 1 );
         }
+
+        if(( spieler.at(s).position.at(0).x == punkt.at(1).position.x ) && ( spieler.at(s).position.at(0).y == punkt.at(1).position.y ))
+        {
+            spieler.at(s).info.geld += zaehler / 100;
+            gotoXY( spielfeld.groesse.x / spieler.size() * s + 8, spielfeld.groesse.y + 5 );
+            cout << spieler.at(s).info.geld << " EURO";
+        }
+
+        if( zaehler % 300 == 0 )
+        {
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe_spielfeld);
+            gotoXY( punkt.at(1).position.x, punkt.at(1).position.y );
+            cout << ' ';
+            punkt.at(1).position.x = 0;
+            punkt.at(1).position.y = 0;
+        }
+
+        if( zaehler % 800 == 0 )
+        {
+            punkt_erstellen( punkt, spielfeld, spieler, 1, 2 );
+            punkt_zeichnen( punkt, spielfeld, spieler, 1, 2 );
+        }
+
+
     }
 }
 
@@ -597,7 +639,7 @@ void spieler_menue( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned in
     cout << "SPIELERMENUE";
 }
 
-void menue_pause( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &essen )
+void menue_pause( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &punkt )
 {
     system("cls");
 
@@ -614,15 +656,15 @@ void menue_pause( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt
     switch( getch() )
     {
         case'1':
-            spiel( spielfeld, spieler, essen );
+            spiel( spielfeld, spieler, punkt );
 
         case'4':
-            menue_cheats( spielfeld, spieler, essen );
+            menue_cheats( spielfeld, spieler, punkt );
     }
 }
 
 
-void menue_cheats( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &essen )
+void menue_cheats( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &punkt )
 {
     system("cls");
 
@@ -650,7 +692,7 @@ void menue_cheats( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punk
         Sleep(800);
     }
 
-    spiel( spielfeld, spieler, essen );
+    spiel( spielfeld, spieler, punkt );
 }
 
 
@@ -673,13 +715,21 @@ void leben( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s )
 }
 
 
-bool gameover( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s )
+bool gameover( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &punkt, unsigned int s )
 {
     bool gameover = spieler.at(s).info.gameover;
 
     if((spieler.at(s).info.waende == true) && ((spieler.at(s).position.at(0).x == 0) || (spieler.at(s).position.at(0).y == 0) || (spieler.at(s).position.at(0).x == spielfeld.groesse.x + 1) || (spieler.at(s).position.at(0).y == spielfeld.groesse.y + 1)))
     {
         leben( spielfeld, spieler, s );
+    }
+
+    for( unsigned int p = 2; p < punkt.size(); p ++ )
+    {
+        if(( spieler.at(s).position.at(0).x == punkt.at(p).position.x ) && ( spieler.at(s).position.at(0).y == punkt.at(p).position.y ))
+        {
+            leben( spielfeld, spieler, s );
+        }
     }
 
     for( unsigned int sp = 0; sp < spieler.size(); sp ++ )
@@ -729,10 +779,11 @@ int main()
 	system( "color 84" );
 
     Spielfeld spielfeld;
-    vector <Punkt> essen(1);
-    vector <Punkt> hinderniss;
+    vector <Punkt> punkt(10);
+    punkt.at(0).farbe = 450;
+    punkt.at(1).farbe = 301;
 
-    vector <Spieler> spieler( eingaben( spielfeld, spieler, hinderniss ) );
+    vector <Spieler> spieler( eingaben( spielfeld, spieler ) );
 
     if( spieler.size() >= 1 )
     {
@@ -849,9 +900,9 @@ int main()
         spieler.at(i).position.at(0).y = spielfeld.groesse.y / 2 + 1;
     }
 
-    punkt_erstellen( essen, spielfeld, spieler );
+    punkt_erstellen( punkt, spielfeld, spieler, 0, punkt.size() );
 
-    spiel( spielfeld, spieler, essen );
+    spiel( spielfeld, spieler, punkt );
 
     return 0;
 }
