@@ -17,9 +17,12 @@ typedef struct
     char
     richtung,
     richtung_alt,
+    richtung_neu,
     richtung_menue;
 
-    int
+    unsigned int
+    pause = 6,
+
     laenge = 10,
     punkte = 0,
     leben = 3,
@@ -42,8 +45,7 @@ typedef struct
 
 typedef struct
 {
-    int x;
-    int y;
+    unsigned int x, y;
 
 } Koordinaten;
 
@@ -72,16 +74,19 @@ typedef struct
 
     bool
     cheats = false,
-    ton = false;
+    ton = false,
+    cursor = true;
 
-    int
+    unsigned int
+    pause = 10,
+
     farbe_spielfeld = 600,
     farbe_wand = 200;
 
     char
     beenden = '0',
-    menue_pause = '1',
-    menue_cheats = '3';
+    menue_pause = '!',
+    menue_cheats = '"';
 
 } Spielfeld;
 
@@ -96,7 +101,7 @@ typedef struct
 typedef struct
 {
     Koordinaten position;
-    int farbe = 450;
+    unsigned int farbe = 450;
 
 } Essen;
 
@@ -109,24 +114,24 @@ void essen_erstellen( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spie
 void essen_zeichnen( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler );
 
 void richtung( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler );
-void richtung_spieler( int richtung, vector <Spieler> &spieler );
+void richtung_spieler( char richtung, vector <Spieler> &spieler );
 void richtung_computer( vector <Spieler> &spieler, Essen &essen );
 
 void spieler(  );
-void spieler_bewegen( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler );
+void spieler_bewegen( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned long long zaehler );
 void spieler_menue(  );
 
-void spieler_informationen( Spielfeld spielfeld, vector <Spieler> spieler, int s );
+void spieler_informationen( Spielfeld spielfeld, vector <Spieler> spieler, unsigned int s );
 
-void menue_spieler( Spielfeld &spielfeld, vector <Spieler> &spieler, int s );
+void menue_spieler( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s );
 
 void menue_pause( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler );
 void menue_cheats( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler );
 
 void einstellungen( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler );
 
-bool gameover( Spielfeld &spielfeld, vector <Spieler> &spieler, int s );
-void leben( Spielfeld &spielfeld, vector <Spieler> &spieler, int s );
+bool gameover( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s );
+void leben( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s );
 
 void spiel( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler );
 
@@ -150,23 +155,23 @@ int eingaben( Spielfeld &spielfeld, vector <Spieler> &spieler )
 
 void spielfeld_erstellen( Spielfeld &spielfeld, vector <Spieler> &spieler )
 {
-    int x, y;
+    unsigned int x, y;
 
     system("cls");
 
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe_wand);
-    for(x = 0; x <= spielfeld.groesse.x + 1; x ++)
+    for( x = 0; x <= spielfeld.groesse.x + 1; x ++ )
     {
         cout << '+';
     }
     cout << '\n';
 
-    for(y = 1; y <= spielfeld.groesse.y; y ++)
+    for( y = 1; y <= spielfeld.groesse.y; y ++ )
     {
         cout << '+';
 
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe_spielfeld);
-        for(x = 1; x <= spielfeld.groesse.x; x ++)
+        for( x = 1; x <= spielfeld.groesse.x; x ++ )
         {
             cout << ' ';
         }
@@ -180,11 +185,9 @@ void spielfeld_erstellen( Spielfeld &spielfeld, vector <Spieler> &spieler )
         cout << '+';
     }
 
-    int i;
-
     for( unsigned int sp = 0; sp < spieler.size(); sp ++ )
     {
-        for( i = 0; i < spieler.at(sp).informationen.laenge; i ++ )
+        for( unsigned int i = 0; i < spieler.at(sp).informationen.laenge; i ++ )
         {
             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(sp).informationen.farbe.at( i % spieler.at(sp).informationen.farbe.size() ));
             gotoXY( spieler.at(sp).position.at(i).x, spieler.at(sp).position.at(i).y );
@@ -220,7 +223,7 @@ void essen_erstellen( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spie
 
         for( unsigned int s = 0; s < spieler.size(); s ++ )
         {
-            for( int i; i < spieler.at(s).informationen.laenge; i ++ )
+            for( unsigned int i; i < spieler.at(s).informationen.laenge; i ++ )
             {
                 if(( essen.position.x == spieler.at(s).position.at(i).x ) && ( essen.position.y == spieler.at(s).position.at(i).y ))
                 {
@@ -241,18 +244,18 @@ void essen_zeichnen( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spiel
 
 void richtung( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler)
 {
-    bool wiederholen;
+    bool wiederholen = true;
 
-    do
+    for( unsigned long long zaehler = 0; wiederholen == true; zaehler ++ )
     {
         if( spielfeld.ton == true )
         {
-            Beep( 1350, 100 );
+            Beep( 1350, spielfeld.pause );
         }
 
         else if( spielfeld.ton == false )
         {
-            Sleep( 100 );
+            Sleep( spielfeld.pause );
         }
 
         if( kbhit() )
@@ -280,7 +283,7 @@ void richtung( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler)
 
         richtung_computer( spieler, essen );
 
-        spieler_bewegen( essen, spielfeld, spieler );
+        spieler_bewegen( essen, spielfeld, spieler, zaehler );
 
 
         for( unsigned int s = 0; s < spieler.size(); s ++ )
@@ -319,11 +322,10 @@ void richtung( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler)
             }
         }
     }
-    while( wiederholen == true );
 }
 
 
-void richtung_spieler( int richtung, vector <Spieler> &spieler )
+void richtung_spieler( char richtung, vector <Spieler> &spieler )
 {
     bool wiederholen;
     unsigned int sp = 0;
@@ -347,7 +349,7 @@ void richtung_spieler( int richtung, vector <Spieler> &spieler )
                 spieler.at(sp).informationen.richtung_alt = spieler.at(sp).informationen.richtung;
             }
 
-            spieler.at(sp).informationen.richtung = richtung;
+            spieler.at(sp).informationen.richtung_neu = richtung;
         }
 
 
@@ -368,33 +370,35 @@ void richtung_computer( vector <Spieler> &spieler, Essen &essen )
         {
             if(( essen.position.y < spieler.at(i).position.at(0).y ) && ( spieler.at(i).informationen.richtung != spieler.at(i).tasten.unten ))
             {
-                spieler.at(i).informationen.richtung = spieler.at(i).tasten.oben;
+                spieler.at(i).informationen.richtung_neu = spieler.at(i).tasten.oben;
             }
 
             else if(( essen.position.y > spieler.at(i).position.at(0).y ) && ( spieler.at(i).informationen.richtung != spieler.at(i).tasten.oben ))
             {
-                spieler.at(i).informationen.richtung = spieler.at(i).tasten.unten;
+                spieler.at(i).informationen.richtung_neu = spieler.at(i).tasten.unten;
             }
 
             else if(( essen.position.x < spieler.at(i).position.at(0).x ) && ( spieler.at(i).informationen.richtung != spieler.at(i).tasten.rechts ))
             {
-                spieler.at(i).informationen.richtung = spieler.at(i).tasten.links;
+                spieler.at(i).informationen.richtung_neu = spieler.at(i).tasten.links;
             }
 
             else if(( essen.position.x > spieler.at(i).position.at(0).x ) && ( spieler.at(i).informationen.richtung != spieler.at(i).tasten.links ))
             {
-                spieler.at(i).informationen.richtung = spieler.at(i).tasten.rechts;
+                spieler.at(i).informationen.richtung_neu = spieler.at(i).tasten.rechts;
             }
         }
     }
 }
 
 
-void spieler_bewegen( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler )
+void spieler_bewegen( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned long long zaehler )
 {
+    unsigned int pause;
+
     for( unsigned int s = 0; s < spieler.size(); s ++ )
     {
-        if( spieler.at(s).informationen.richtung == spieler.at(s).tasten.menue_spieler )
+        if( spieler.at(s).informationen.richtung_neu == spieler.at(s).tasten.menue_spieler )
         {
             if( spieler.at(s).informationen.menue == false )
             {
@@ -408,12 +412,24 @@ void spieler_bewegen( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spie
                 spieler_informationen( spielfeld, spieler, s );
             }
 
-            spieler.at(s).informationen.richtung = spieler.at(s).informationen.richtung_alt;
+            spieler.at(s).informationen.richtung_neu = spieler.at(s).informationen.richtung_alt;
         }
 
-        if( spieler.at(s).informationen.gameover == false )
+        if( spieler.at(s).informationen.richtung == spieler.at(s).informationen.richtung_alt )
         {
-            for( int i = 0; i < spieler.at(s).informationen.laenge; i ++ )
+            pause = zaehler % ( spieler.at(s).informationen.pause / 2 );
+        }
+
+        else
+        {
+            pause = zaehler % spieler.at(s).informationen.pause;
+        }
+
+        if(( pause == 0 ) && ( spieler.at(s).informationen.gameover == false ))
+        {
+            spieler.at(s).informationen.richtung = spieler.at(s).informationen.richtung_neu;
+
+            for( unsigned int i = 0; i < spieler.at(s).informationen.laenge; i ++ )
             {
                 SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(s).informationen.farbe.at( i % spieler.at(s).informationen.farbe.size() ));
                 gotoXY( spieler.at(s).position.at(i).x, spieler.at(s).position.at(i).y );
@@ -522,10 +538,15 @@ void spieler_bewegen( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spie
 
             spieler.at(s).informationen.gameover = gameover( spielfeld, spieler,  s );
         }
+
+        if( spielfeld.cursor == false )
+        {
+            SetCursorPos( 2000, 2000 );
+        }
     }
 }
 
-void spieler_informationen( Spielfeld spielfeld, vector <Spieler> spieler, int s )
+void spieler_informationen( Spielfeld spielfeld, vector <Spieler> spieler, unsigned int s )
 {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(s).informationen.farbe.at(0));
 
@@ -545,7 +566,7 @@ void spieler_informationen( Spielfeld spielfeld, vector <Spieler> spieler, int s
     cout << "LEBEN:  " << spieler.at(s).informationen.leben;
 }
 
-void menue_spieler( Spielfeld &spielfeld, vector <Spieler> &spieler, int s )
+void menue_spieler( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s )
 {
     gotoXY( spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 2 );
     cout << "SPIELERMENUE";
@@ -686,7 +707,7 @@ void einstellungen( Essen &essen, Spielfeld &spielfeld, vector <Spieler> &spiele
 
 }
 
-bool gameover( Spielfeld &spielfeld, vector <Spieler> &spieler, int s )
+bool gameover( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s )
 {
     bool gameover = spieler.at(s).informationen.gameover;
 
@@ -697,7 +718,7 @@ bool gameover( Spielfeld &spielfeld, vector <Spieler> &spieler, int s )
 
     for( unsigned int sp = 0; sp < spieler.size(); sp ++ )
     {
-        for( int i = 0; i < spieler.at(sp).informationen.laenge; i ++ )
+        for( unsigned int i = 0; i < spieler.at(sp).informationen.laenge; i ++ )
         {
             if(( spieler.at(s).position.at(0).x == spieler.at(sp).position.at(i).x ) && ( spieler.at(s).position.at(0).y == spieler.at(sp).position.at(i).y ) && ( sp != s ))
             {
@@ -706,7 +727,7 @@ bool gameover( Spielfeld &spielfeld, vector <Spieler> &spieler, int s )
         }
     }
 
-    for( int i = 1; i < spieler.at(s).informationen.laenge; i ++ )
+    for( unsigned int i = 1; i < spieler.at(s).informationen.laenge; i ++ )
     {
         if(( spieler.at(s).position.at(0).x == spieler.at(s).position.at(i).x ) && ( spieler.at(s).position.at(0).y == spieler.at(s).position.at(i).y ))
         {
@@ -722,7 +743,7 @@ bool gameover( Spielfeld &spielfeld, vector <Spieler> &spieler, int s )
 return gameover;
 }
 
-void leben( Spielfeld &spielfeld, vector <Spieler> &spieler, int s )
+void leben( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s )
 {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(s).informationen.farbe.at(0));
 
@@ -731,7 +752,7 @@ void leben( Spielfeld &spielfeld, vector <Spieler> &spieler, int s )
 
     if( spieler.at(s).informationen.leben > 0 )
     {
-        spieler.at(s).informationen.richtung = ' ';
+        spieler.at(s).informationen.richtung_neu = ' ';
         spieler.at(s).position.at(0).x = spielfeld.groesse.x / spieler.size() * s + spielfeld.groesse.x / ( spieler.size() * 2 );
         spieler.at(s).position.at(0).y = spielfeld.groesse.y / 2 + 1;
     }
@@ -805,6 +826,7 @@ int main()
     if( spieler.size() >= 3 )
     {
         spieler.at(2).informationen.name = "PADFOOT";
+        spieler.at(2).informationen.pause = 3;
         spieler.at(2).informationen.farbe.resize( 2 );
         spieler.at(2).informationen.farbe.at(0) = 52;
         spieler.at(2).informationen.farbe.at(1) = 100;
@@ -870,7 +892,7 @@ int main()
     for( unsigned int i = 0; i < spieler.size(); i ++ )
     {
         spieler.at(i).position.resize( spieler.at(i).informationen.laenge );
-        spieler.at(i).informationen.richtung = ' ';
+        spieler.at(i).informationen.richtung_neu = ' ';
 
         spieler.at(i).position.at(0).x = spielfeld.groesse.x / spieler.size() * i + spielfeld.groesse.x / ( spieler.size() * 2 );
         spieler.at(i).position.at(0).y = spielfeld.groesse.y / 2 + 1;
