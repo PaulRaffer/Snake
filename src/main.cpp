@@ -1,6 +1,7 @@
 /*
     SNAKE
-    Version: 23.0.0
+    Version: 24.0.0
+    23.06.2017
 
     Raffer Paul
     1BHEL 22
@@ -134,7 +135,8 @@ typedef struct
     char
     richtung;
 
-    Zeitmessung zeit;
+    Zeitmessung zeit_betreten;
+    Zeitmessung zeit_ereignis;
 
 } Gebaeude_x;
 
@@ -152,6 +154,7 @@ typedef struct
     Koordinaten pos;
     char richtung;
     unsigned int farbe;
+    Zeitmessung zeit;
 
 } Punkt;
 
@@ -176,7 +179,6 @@ typedef struct
     Tasten tasten;
 
     vector <Punkt> punkt;
-    Zeitmessung zeit;
 
 } Spieler;
 
@@ -336,42 +338,40 @@ void spiel( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, tim
 
 void spielfeld_erstellen( Spielfeld &spielfeld, vector <Spieler> &spieler )
 {
-    unsigned int x, y;
-
     system("cls");
 
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe.wand);
-    for( x = 0; x <= spielfeld.groesse.x + 1; x ++ )
-    {
-        cout << '+';
-    }
-    cout << '\n';
 
-    for( y = 1; y <= spielfeld.groesse.y; y ++ )
+    for( unsigned int y = 0; y <= spielfeld.groesse.y + 1; y ++ )
     {
-        cout << '+';
 
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe.spielfeld);
-        for( x = 1; x <= spielfeld.groesse.x; x ++ )
+        for( unsigned int x = 0; x <= spielfeld.groesse.x + 1; x ++ )
         {
-            cout << ' ';
+            if(( x == 0 ) || ( x == spielfeld.groesse.x + 1 )
+            || ( y == 0 ) || ( y == spielfeld.groesse.y + 1 ))
+            {
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe.wand);
+                cout << '+';
+            }
+
+            else
+            {
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe.spielfeld);
+                cout << ' ';
+            }
         }
 
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe.wand);
-        cout << "+\n";
-    }
-
-    for( x = 0; x <= spielfeld.groesse.x + 1; x ++ )
-    {
-        cout << '+';
+        cout << endl;
     }
 
     /*
-        ++++++++++
-        +        +
-        +        +
-        +        +
-        ++++++++++
+          0 1 2 3 4 5
+        0 + + + + + +
+        1 +         +
+        2 +         +
+        3 +         +
+        4 +         +
+        5 + + + + + +
     */
 
     for( unsigned int sp = 0; sp < spieler.size(); sp ++ )
@@ -527,6 +527,11 @@ void richtung_spieler( char richtung, vector <Spieler> &spieler )
                     || (( spieler.at(sp).schlange.diagonal_fahren == true ) && ( richtung == spieler.at(sp).tasten.unten_links ) && ( spieler.at(sp).schlange.richtung != spieler.at(sp).tasten.oben_rechts ))
                     || (( spieler.at(sp).schlange.diagonal_fahren == true ) && ( richtung == spieler.at(sp).tasten.unten_rechts ) && ( spieler.at(sp).schlange.richtung != spieler.at(sp).tasten.oben_links ))))
         {
+            if( spieler.at(sp).schlange.bewegen == true )
+            {
+                spieler.at(sp).schlange.richtung_alt = spieler.at(sp).schlange.richtung;
+            }
+
             spieler.at(sp).schlange.richtung = richtung;
         }
 
@@ -575,16 +580,16 @@ void gebaeude_betreten( Spielfeld &spielfeld, vector <Spieler> &spieler, vector 
     for( unsigned int i = 0; i < gebaeude.size(); i ++ )
     {
         if(( gebaeude.at(i).gebaut == true )
-        && ( gebaeude.at(i).verschieben == false )
-        && ( gebaeude.at(i).betreten == false )
-        && ( spieler.at(s).schlange.pos.at(0).x <= gebaeude.at(i).ende_pos.x )
-        && ( spieler.at(s).schlange.pos.at(0).y <= gebaeude.at(i).ende_pos.y )
-        && ( spieler.at(s).schlange.pos.at(0).x >= gebaeude.at(i).start_pos.x )
-        && ( spieler.at(s).schlange.pos.at(0).y >= gebaeude.at(i).start_pos.y ))
+                && ( gebaeude.at(i).verschieben == false )
+                && ( gebaeude.at(i).betreten == false )
+                && ( spieler.at(s).schlange.pos.at(0).x <= gebaeude.at(i).ende_pos.x )
+                && ( spieler.at(s).schlange.pos.at(0).y <= gebaeude.at(i).ende_pos.y )
+                && ( spieler.at(s).schlange.pos.at(0).x >= gebaeude.at(i).start_pos.x )
+                && ( spieler.at(s).schlange.pos.at(0).y >= gebaeude.at(i).start_pos.y ))
         {
             spieler.at(s).schlange.bewegen = false;
             gebaeude.at(i).betreten = true;
-            gebaeude.at(i).zeit.start = clock();
+            gebaeude.at(i).zeit_betreten.start = clock();
         }
 
         else if( gebaeude.at(i).betreten == true )
@@ -606,7 +611,7 @@ void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, u
             gebaeude_betreten( spielfeld, spieler, spieler.at(s).gebaeude.krankenhaus, s );
             gebaeude_betreten( spielfeld, spieler, spieler.at(s).gebaeude.geldlager, s );
 
-            spieler.at(s).schlange.richtung = ' ';
+            spieler.at(s).schlange.richtung = spieler.at(s).schlange.richtung_alt;
         }
 
 
@@ -627,14 +632,13 @@ void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, u
         {
             if( spieler.at(s).gebaeude.krankenhaus.at(i).betreten == true )
             {
-                spieler.at(s).gebaeude.krankenhaus.at(i).zeit.ende = clock() - spieler.at(s).gebaeude.krankenhaus.at(i).zeit.start;
-                if( spieler.at(s).gebaeude.krankenhaus.at(i).zeit.ende >= 40000 )
+                spieler.at(s).gebaeude.krankenhaus.at(i).zeit_betreten.ende = clock() - spieler.at(s).gebaeude.krankenhaus.at(i).zeit_betreten.start;
+                if( spieler.at(s).gebaeude.krankenhaus.at(i).zeit_betreten.ende >= 40000 )
                 {
                     spieler.at(s).leben ++;
-                    spieler.at(s).gebaeude.krankenhaus.at(i).zeit.start = clock();
+                    spieler.at(s).gebaeude.krankenhaus.at(i).zeit_betreten.start = clock();
 
                     spieler_informationen( spielfeld, spieler, s );
-                    spieler.at(s).schlange.richtung = spieler.at(s).schlange.richtung_alt;
                 }
             }
         }
@@ -656,7 +660,6 @@ void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, u
                 }
 
                 spieler_informationen( spielfeld, spieler, s );
-                spieler.at(s).schlange.richtung = spieler.at(s).schlange.richtung_alt;
             }
         }
 
@@ -716,10 +719,10 @@ void gebaeude_farbe( vector <Spieler> spieler, vector <Gebaeude_x> gebaeude, uns
     for( unsigned int g = 0; g < gebaeude.size(); g ++ )
     {
         if(( spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).x <= gebaeude.at(g).ende_pos.x )
-        && ( spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).y <= gebaeude.at(g).ende_pos.y )
-        && ( spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).x >= gebaeude.at(g).start_pos.x )
-        && ( spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).y >= gebaeude.at(g).start_pos.y )
-        && ( gebaeude.at(g).gebaut == true ))
+                && ( spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).y <= gebaeude.at(g).ende_pos.y )
+                && ( spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).x >= gebaeude.at(g).start_pos.x )
+                && ( spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).y >= gebaeude.at(g).start_pos.y )
+                && ( gebaeude.at(g).gebaut == true ))
         {
             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(i).farbe.at(0));
         }
@@ -752,59 +755,12 @@ void spieler_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &p
 
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe.spielfeld);
 
-
-
         for( unsigned int i = 0; i < spieler.size(); i ++ )
         {
             gebaeude_farbe( spieler, spieler.at(i).gebaeude.zentrale, s, i );
             gebaeude_farbe( spieler, spieler.at(i).gebaeude.kanone, s, i );
             gebaeude_farbe( spieler, spieler.at(i).gebaeude.krankenhaus, s, i );
             gebaeude_farbe( spieler, spieler.at(i).gebaeude.geldlager, s, i );
-        }
-
-        for( unsigned int i = 0; i < spieler.size(); i ++ )
-        {
-            for( unsigned int g = 0; g < spieler.at(i).gebaeude.kanone.size(); g ++ )
-            {
-                if(( spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).x <= spieler.at(i).gebaeude.kanone.at(g).ende_pos.x )
-                        && ( spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).y <= spieler.at(i).gebaeude.kanone.at(g).ende_pos.y )
-                        && ( spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).x >= spieler.at(i).gebaeude.kanone.at(g).start_pos.x )
-                        && ( spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).y >= spieler.at(i).gebaeude.kanone.at(g).start_pos.y )
-                        && ( spieler.at(i).gebaeude.kanone.at(g).gebaut == true ))
-                {
-                    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(i).farbe.at(0));
-                }
-            }
-        }
-
-        for( unsigned int i = 0; i < spieler.size(); i ++ )
-        {
-            for( unsigned int g = 0; g < spieler.at(i).gebaeude.krankenhaus.size(); g ++ )
-            {
-                if(( spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).x <= spieler.at(i).gebaeude.krankenhaus.at(g).ende_pos.x )
-                        && ( spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).y <= spieler.at(i).gebaeude.krankenhaus.at(g).ende_pos.y )
-                        && ( spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).x >= spieler.at(i).gebaeude.krankenhaus.at(g).start_pos.x )
-                        && ( spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).y >= spieler.at(i).gebaeude.krankenhaus.at(g).start_pos.y )
-                        && ( spieler.at(i).gebaeude.krankenhaus.at(g).gebaut == true ))
-                {
-                    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(i).farbe.at(0));
-                }
-            }
-        }
-
-        for( unsigned int i = 0; i < spieler.size(); i ++ )
-        {
-            for( unsigned int g = 0; g < spieler.at(i).gebaeude.geldlager.size(); g ++ )
-            {
-                if(( spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).x <= spieler.at(i).gebaeude.geldlager.at(g).ende_pos.x )
-                        && ( spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).y <= spieler.at(i).gebaeude.geldlager.at(g).ende_pos.y )
-                        && ( spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).x >= spieler.at(i).gebaeude.geldlager.at(g).start_pos.x )
-                        && ( spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).y >= spieler.at(i).gebaeude.geldlager.at(g).start_pos.y )
-                        && ( spieler.at(i).gebaeude.geldlager.at(g).gebaut == true ))
-                {
-                    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(i).farbe.at(0));
-                }
-            }
         }
 
         gotoXY( spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).x, spieler.at(s).schlange.pos.at( spieler.at(s).schlange.pos.size() - 1 ).y );
@@ -946,38 +902,21 @@ void gebaeude( vector <Spieler> &spieler, unsigned int s )
 {
     for( unsigned int i = 0; i < spieler.at(s).gebaeude.kanone.size(); i ++ )
     {
-        spieler.at(s).gebaeude.kanone.at(i).zeit.ende = clock() - spieler.at(s).gebaeude.kanone.at(i).zeit.start;
+        spieler.at(s).gebaeude.kanone.at(i).zeit_ereignis.ende = clock() - spieler.at(s).gebaeude.kanone.at(i).zeit_ereignis.start;
 
-        if(( spieler.at(s).gebaeude.kanone.at(i).gebaut == true ) && ( spieler.at(s).gebaeude.kanone.at(i).verschieben == false ) && ( spieler.at(s).gebaeude.kanone.at(i).zeit.ende >= 800 ))
+        if(( spieler.at(s).gebaeude.kanone.at(i).gebaut == true )
+        && ( spieler.at(s).gebaeude.kanone.at(i).verschieben == false )
+        && ( spieler.at(s).gebaeude.kanone.at(i).zeit_ereignis.ende >= 1200 ))
         {
-            spieler.at(s).gebaeude.kanone.at(i).zeit.start = clock();
+            spieler.at(s).gebaeude.kanone.at(i).zeit_ereignis.start = clock();
 
             spieler.at(s).punkt.resize( spieler.at(s).punkt.size() + 1 );
 
             spieler.at(s).punkt.at( spieler.at(s).punkt.size() - 1 ).pos.x = ( spieler.at(s).gebaeude.kanone.at(i).start_pos.x + spieler.at(s).gebaeude.kanone.at(i).ende_pos.x ) / 2;
             spieler.at(s).punkt.at( spieler.at(s).punkt.size() - 1 ).pos.y = ( spieler.at(s).gebaeude.kanone.at(i).start_pos.y + spieler.at(s).gebaeude.kanone.at(i).ende_pos.y ) / 2;
 
-            unsigned int zufall = rand() % 4;
-
-            if( zufall == 0 )
-            {
-                spieler.at(s).punkt.at( spieler.at(s).punkt.size() - 1 ).richtung = spieler.at(s).tasten.oben;
-            }
-
-            else if( zufall == 1 )
-            {
-                spieler.at(s).punkt.at( spieler.at(s).punkt.size() - 1 ).richtung = spieler.at(s).tasten.unten;
-            }
-
-            else if( zufall == 2 )
-            {
-                spieler.at(s).punkt.at( spieler.at(s).punkt.size() - 1 ).richtung = spieler.at(s).tasten.links;
-            }
-
-            else if( zufall == 3 )
-            {
-                spieler.at(s).punkt.at( spieler.at(s).punkt.size() - 1 ).richtung = spieler.at(s).tasten.rechts;
-            }
+            spieler.at(s).gebaeude.kanone.at(i).richtung = 'd';
+            spieler.at(s).punkt.at( spieler.at(s).punkt.size() - 1 ).richtung = spieler.at(s).gebaeude.kanone.at(i).richtung;
         }
     }
 }
@@ -985,14 +924,14 @@ void gebaeude( vector <Spieler> &spieler, unsigned int s )
 
 void punkte_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s )
 {
-    spieler.at(s).zeit.ende = clock() - spieler.at(s).zeit.start;
-
-    if( spieler.at(s).zeit.ende >= 70 )
+    for( unsigned long long i = 0; i < spieler.at(s).punkt.size(); i ++ )
     {
-        spieler.at(s).zeit.start = clock();
+        spieler.at(s).punkt.at(i).zeit.ende = clock() - spieler.at(s).punkt.at(i).zeit.start;
 
-        for( unsigned int i = 0; i < spieler.at(s).punkt.size(); i ++ )
+        if( spieler.at(s).punkt.at(i).zeit.ende >= 40 )
         {
+            spieler.at(s).punkt.at(i).zeit.start = clock();
+
             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe.spielfeld);
             gotoXY( spieler.at(s).punkt.at(i).pos.x, spieler.at(s).punkt.at(i).pos.y );
             cout << ' ';
@@ -1356,12 +1295,12 @@ void gebaeude_gameover( Spielfeld &spielfeld, vector <Spieler> &spieler, vector 
     for( unsigned int i = 0; i < gebaeude.size(); i ++ )
     {
         if(( spieler.at(s).schlange.pos.at(0).x <= gebaeude.at(i).ende_pos.x )
-        && ( spieler.at(s).schlange.pos.at(0).y <= gebaeude.at(i).ende_pos.y )
-        && ( spieler.at(s).schlange.pos.at(0).x >= gebaeude.at(i).start_pos.x )
-        && ( spieler.at(s).schlange.pos.at(0).y >= gebaeude.at(i).start_pos.y )
-        && ( gebaeude.at(i).gebaut == true )
-        && ( gebaeude.at(i).verschieben == false )
-        && ( sp != s ))
+                && ( spieler.at(s).schlange.pos.at(0).y <= gebaeude.at(i).ende_pos.y )
+                && ( spieler.at(s).schlange.pos.at(0).x >= gebaeude.at(i).start_pos.x )
+                && ( spieler.at(s).schlange.pos.at(0).y >= gebaeude.at(i).start_pos.y )
+                && ( gebaeude.at(i).gebaut == true )
+                && ( gebaeude.at(i).verschieben == false )
+                && ( sp != s ))
         {
             spieler.at(sp).geld += spieler.at(s).geld;
             leben( spielfeld, spieler, s );
@@ -1422,7 +1361,7 @@ bool gameover( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &
                     leben( spielfeld, spieler, s );
                     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(sp).farbe.at(0));
                     gotoXY( spielfeld.groesse.x / spieler.size() * sp + 8, spielfeld.groesse.y + 5 );
-                cout << spieler.at(sp).geld << " EURO      ";
+                    cout << spieler.at(sp).geld << " EURO      ";
                 }
             }
         }
@@ -1507,7 +1446,7 @@ int main()
             punkte.leben.at(i).farbe = 192;
         }
 
-        punkte.hindernis.resize(50);
+        punkte.hindernis.resize(0);
         for( unsigned int i = 0; i < punkte.hindernis.size(); i ++ )
         {
             punkte.hindernis.at(i).farbe = 0;
