@@ -22,7 +22,7 @@ typedef struct
 
     unsigned int
     pause = 6,
-    beschleunigung = 2,
+    beschleunigung = 3,
 
     laenge = 10,
     punkte = 0,
@@ -166,7 +166,8 @@ void spiel( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &pun
 
     spielfeld_erstellen( spielfeld, spieler );
 
-    punkt_zeichnen( punkt, spielfeld, spieler, 0, punkt.size() );
+    punkt_zeichnen( punkt, spielfeld, spieler, 0, 1 );
+    punkt_zeichnen( punkt, spielfeld, spieler, 4, punkt.size() );
 
     for( unsigned int i = 0; i < spieler.size(); i ++ )
     {
@@ -253,13 +254,8 @@ void spielfeld_erstellen( Spielfeld &spielfeld, vector <Spieler> &spieler )
 
 void punkt_erstellen( vector <Punkt> &punkt, Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int k, unsigned int g )
 {
-    bool wiederholen;
-
+    bool wiederholen = false;
     time_t t;
-
-
-
-    wiederholen = false;
 
     time(&t);
     srand(( unsigned int )t );
@@ -268,14 +264,14 @@ void punkt_erstellen( vector <Punkt> &punkt, Spielfeld &spielfeld, vector <Spiel
     {
         do
         {
+            wiederholen = false;
 
-
-            punkt.at(p).position.x = rand() % spielfeld.groesse.x + 1;
-            punkt.at(p).position.y = rand() % spielfeld.groesse.y + 1;
+            punkt.at(p).position.x = ( "&d", ( rand() + 100 * p ) % spielfeld.groesse.x ) + 1;
+            punkt.at(p).position.y = ( "&d", ( rand() + 100 * p ) % spielfeld.groesse.y ) + 1;
 
             for( unsigned int s = 0; s < spieler.size(); s ++ )
             {
-                for( unsigned int i; i < spieler.at(s).info.laenge; i ++ )
+                for( unsigned int i = 0; i < spieler.at(s).info.laenge; i ++ )
                 {
                     if(( punkt.at(p).position.x == spieler.at(s).position.at(i).x ) && ( punkt.at(p).position.y == spieler.at(s).position.at(i).y ))
                     {
@@ -284,15 +280,13 @@ void punkt_erstellen( vector <Punkt> &punkt, Spielfeld &spielfeld, vector <Spiel
                 }
             }
 
-            for( unsigned int j = 0, wiederholen = false; j < p; j ++ )
+            for( unsigned int j = 0; j < p; j ++ )
             {
                 if(( punkt.at(p).position.x == punkt.at(j).position.x ) && ( punkt.at(p).position.y == punkt.at(j).position.y ))
                 {
                     wiederholen = true;
                 }
             }
-
-
         }
         while( wiederholen == true );
     }
@@ -419,6 +413,8 @@ void richtung_computer( vector <Spieler> &spieler, vector <Punkt> &punkt )
 
 void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &punkt, unsigned long long zaehler )
 {
+    static double time1=0.0, tstart;
+
     for( unsigned int s = 0; s < spieler.size(); s ++ )
     {
         if( spieler.at(s).info.richtung_neu == spieler.at(s).tasten.menue_spieler )
@@ -448,12 +444,37 @@ void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &p
             SetCursorPos( 2000, 2000 );
         }
     }
+
+    static unsigned int z = 1;
+
+    if( time1 > 10000 )
+    {
+        tstart = clock();
+        z = ( "&d", rand() % 3 ) + 1;
+        punkt_erstellen( punkt, spielfeld, spieler, z, z + 1 );
+        punkt_zeichnen( punkt, spielfeld, spieler, z, z + 1 );
+    }
+
+    time1 = clock() - tstart;
+    if( time1 > 8000 )
+    {
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe_spielfeld);
+        gotoXY( punkt.at(z).position.x, punkt.at(z).position.y );
+        cout << ' ';
+        punkt.at(z).position.x = 0;
+        punkt.at(z).position.y = 0;
+    }
 }
 
 
 void spieler_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &punkt, unsigned long long zaehler, unsigned int s )
 {
     unsigned int pause = zaehler % spieler.at(s).info.pause;
+
+    time_t t;
+
+    time(&t);
+    srand(( unsigned int )t );
 
     if( spieler.at(s).info.richtung_neu == spieler.at(s).info.richtung_alt )
     {
@@ -589,26 +610,20 @@ void spieler_bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <P
         if(( spieler.at(s).position.at(0).x == punkt.at(1).position.x ) && ( spieler.at(s).position.at(0).y == punkt.at(1).position.y ))
         {
             spieler.at(s).info.geld += zaehler / 100;
+            punkt.at(1).position.x = 0;
+            punkt.at(1).position.y = 0;
             gotoXY( spielfeld.groesse.x / spieler.size() * s + 8, spielfeld.groesse.y + 5 );
             cout << spieler.at(s).info.geld << " EURO";
         }
 
-        if( zaehler % 300 == 0 )
+        if(( spieler.at(s).position.at(0).x == punkt.at(2).position.x ) && ( spieler.at(s).position.at(0).y == punkt.at(2).position.y ))
         {
-            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe_spielfeld);
-            gotoXY( punkt.at(1).position.x, punkt.at(1).position.y );
-            cout << ' ';
-            punkt.at(1).position.x = 0;
-            punkt.at(1).position.y = 0;
+            spieler.at(s).info.leben += 1;
+            punkt.at(2).position.x = 0;
+            punkt.at(2).position.y = 0;
+            gotoXY( spielfeld.groesse.x / spieler.size() * s + 8, spielfeld.groesse.y + 6 );
+            cout << spieler.at(s).info.leben;
         }
-
-        if( zaehler % 800 == 0 )
-        {
-            punkt_erstellen( punkt, spielfeld, spieler, 1, 2 );
-            punkt_zeichnen( punkt, spielfeld, spieler, 1, 2 );
-        }
-
-
     }
 }
 
@@ -724,7 +739,7 @@ bool gameover( Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &
         leben( spielfeld, spieler, s );
     }
 
-    for( unsigned int p = 2; p < punkt.size(); p ++ )
+    for( unsigned int p = 3; p < punkt.size(); p ++ )
     {
         if(( spieler.at(s).position.at(0).x == punkt.at(p).position.x ) && ( spieler.at(s).position.at(0).y == punkt.at(p).position.y ))
         {
@@ -780,8 +795,9 @@ int main()
 
     Spielfeld spielfeld;
     vector <Punkt> punkt(10);
-    punkt.at(0).farbe = 450;
+    punkt.at(0).farbe = 0;
     punkt.at(1).farbe = 301;
+    punkt.at(2).farbe = 450;
 
     vector <Spieler> spieler( eingaben( spielfeld, spieler ) );
 
@@ -900,7 +916,8 @@ int main()
         spieler.at(i).position.at(0).y = spielfeld.groesse.y / 2 + 1;
     }
 
-    punkt_erstellen( punkt, spielfeld, spieler, 0, punkt.size() );
+    punkt_erstellen( punkt, spielfeld, spieler, 3, punkt.size() );
+    punkt_erstellen( punkt, spielfeld, spieler, 0, 1 );
 
     spiel( spielfeld, spieler, punkt );
 
