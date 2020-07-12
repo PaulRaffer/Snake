@@ -111,6 +111,9 @@ typedef struct
     level,
     farbe;
 
+    bool
+    richtung;
+
     Zeitmessung zeit;
 
 } Gebaeude;
@@ -225,9 +228,13 @@ void spiel( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte )
 
     spielfeld_erstellen( spielfeld, spieler );
 
-    for( unsigned int i = 0; i < spieler.size(); i ++ )
+    for( unsigned int s = 0; s < spieler.size(); s ++ )
     {
-        gebaeude_zeichnen( spieler, i, 0 );
+        for( unsigned int g = 0; g < spieler.at(s).gebaeude.size(); g ++ )
+        {
+            if( spieler.at(s).gebaeude.at(g).gebaut == true )
+                gebaeude_zeichnen( spieler, s, g );
+        }
     }
 
     punkte_zeichnen( punkte.hindernis );
@@ -754,7 +761,7 @@ void gebaeude( vector <Spieler> &spieler, unsigned int s )
 {
     spieler.at(s).gebaeude.at(1).zeit.ende = clock() - spieler.at(s).gebaeude.at(1).zeit.start;
 
-    if(( spieler.at(s).gebaeude.at(1).gebaut == true ) && ( spieler.at(s).gebaeude.at(1).verschieben == false ) && ( spieler.at(s).gebaeude.at(1).zeit.ende >= 1500 ))
+    if(( spieler.at(s).gebaeude.at(1).gebaut == true ) && ( spieler.at(s).gebaeude.at(1).verschieben == false ) && ( spieler.at(s).gebaeude.at(1).zeit.ende >= 800 ))
     {
         spieler.at(s).gebaeude.at(1).zeit.start = clock();
 
@@ -763,9 +770,29 @@ void gebaeude( vector <Spieler> &spieler, unsigned int s )
         spieler.at(s).punkt.at( spieler.at(s).punkt.size() - 1 ).pos.x = ( spieler.at(s).gebaeude.at(1).start_pos.x + spieler.at(s).gebaeude.at(1).ende_pos.x ) / 2;
         spieler.at(s).punkt.at( spieler.at(s).punkt.size() - 1 ).pos.y = ( spieler.at(s).gebaeude.at(1).start_pos.y + spieler.at(s).gebaeude.at(1).ende_pos.y ) / 2;
 
-        spieler.at(s).punkt.at( spieler.at(s).punkt.size() - 1 ).richtung = spieler.at(s).tasten.rechts;
-
         spieler.at(s).punkt.at( spieler.at(s).punkt.size() - 1 ).farbe = spieler.at(s).farbe.at(0);
+
+        unsigned int zufall = rand() % 4;
+
+        if( zufall == 0 )
+        {
+            spieler.at(s).punkt.at( spieler.at(s).punkt.size() - 1 ).richtung = spieler.at(s).tasten.oben;
+        }
+
+        else if( zufall == 1 )
+        {
+            spieler.at(s).punkt.at( spieler.at(s).punkt.size() - 1 ).richtung = spieler.at(s).tasten.unten;
+        }
+
+        else if( zufall == 2 )
+        {
+            spieler.at(s).punkt.at( spieler.at(s).punkt.size() - 1 ).richtung = spieler.at(s).tasten.links;
+        }
+
+        else if( zufall == 3 )
+        {
+            spieler.at(s).punkt.at( spieler.at(s).punkt.size() - 1 ).richtung = spieler.at(s).tasten.rechts;
+        }
     }
 }
 
