@@ -267,12 +267,12 @@ void farben();
 
 void zeile(char zeichen)
 {
-	cout << endl;
+	cout << '\n';
 	for (unsigned int z = 0; z < 100; z ++)
 	{
 		cout << zeichen;
 	}
-	cout << endl << endl;
+	cout << "\n\n";
 }
 
 void spielanleitung(Spiel_info& spiel_info, vector <Spieler> &spieler)
@@ -282,16 +282,16 @@ void spielanleitung(Spiel_info& spiel_info, vector <Spieler> &spieler)
 	
 	cout
 		<< "INFORMATIONEN ZUM SPIEL\n"
-		<< endl
-		<< "Name:\t\t" << spiel_info.name << endl
-		<< "Version:\t" << spiel_info.version << endl
-		<< "Datum:\t\t" << spiel_info.datum.tag << '.' << spiel_info.datum.monat << '.' << spiel_info.datum.jahr << endl;
+		<< '\n'
+		<< "Name:\t\t" << spiel_info.name << '\n'
+		<< "Version:\t" << spiel_info.version << '\n'
+		<< "Datum:\t\t" << spiel_info.datum.tag << '.' << spiel_info.datum.monat << '.' << spiel_info.datum.jahr << '\n';
 	
 	zeile('*');
 	
 	cout
 		<< "ENTWICKLER\n"
-		<< endl
+		<< '\n'
 		<< "Name:\t\tRaffer Paul\n"
 		<< "Schule:\t\tHTBL Hollabrunn\n"
 		<< "Klasse:\t\t1BHEL\n"
@@ -301,9 +301,9 @@ void spielanleitung(Spiel_info& spiel_info, vector <Spieler> &spieler)
 	
 	cout
 		<< "SPIELFELD\n"
-		<< endl
+		<< '\n'
 		<< "Es kann mit voreingestellter Spielfeldgroesse gespielt (\"1\" oder \"2\" druecken, 1: X=156 Y=71, 2: X=235 Y=63) oder die Spielfeldgroesse vor dem Spiel eingegeben werden.\n"
-		<< endl
+		<< '\n'
 		<< "  0 1 2 3 4 5\n"
 		<< "0 + + + + + +\n"
 		<< "1 +         +\n"
@@ -316,60 +316,59 @@ void spielanleitung(Spiel_info& spiel_info, vector <Spieler> &spieler)
 	
 	cout
 		<< "STEUERUNG\n"
-		<< endl
+		<< '\n'
 		<< "In den Einstellungen kann man die Tasten, die für die Steuerung verwendet werden festlegen.\n"
 		<< "Folgende Tasten sind im Moment eingestellt:\n";
 	
 	for (unsigned int s = 0; s < spieler.size(); s ++)
 	{
 		cout
-			<< endl
-			<< endl
-			<< spieler.at(s).name << endl
-			<< endl
-			<< spieler.at(s).tasten.oben_links << "   " << spieler.at(s).tasten.oben << "   " << spieler.at(s).tasten.oben_rechts << endl
+			<< "\n\n"
+			<< spieler.at(s).name << '\n'
+			<< '\n'
+			<< spieler.at(s).tasten.oben_links << "   " << spieler.at(s).tasten.oben << "   " << spieler.at(s).tasten.oben_rechts << '\n'
 			<< "  \\ | /\n"
-			<< spieler.at(s).tasten.links << " --" << spieler.at(s).tasten.menue << "-- " << spieler.at(s).tasten.rechts << endl
+			<< spieler.at(s).tasten.links << " --" << spieler.at(s).tasten.menue << "-- " << spieler.at(s).tasten.rechts << '\n'
 			<< "  / | \\\n"
-			<< spieler.at(s).tasten.unten_links << "   " << spieler.at(s).tasten.unten << "   " << spieler.at(s).tasten.unten_rechts << endl
-			<< endl
-			<< "Oben:\t\t" << spieler.at(s).tasten.oben << endl
-			<< "Unten:\t\t" << spieler.at(s).tasten.unten << endl
-			<< "Links:\t\t" << spieler.at(s).tasten.links << endl
-			<< "Rechts:\t\t" << spieler.at(s).tasten.rechts << endl
-			<< endl
-			<< "Obenlinks:\t" << spieler.at(s).tasten.oben_links << endl
-			<< "Obenrechts:\t" << spieler.at(s).tasten.oben_rechts << endl
-			<< "Untenlinks:\t" << spieler.at(s).tasten.unten_links << endl
-			<< "Untenrechts:\t" << spieler.at(s).tasten.unten_rechts << endl
-			<< endl
-			<< "Pause:\t\t" << spieler.at(s).tasten.menue << endl;
+			<< spieler.at(s).tasten.unten_links << "   " << spieler.at(s).tasten.unten << "   " << spieler.at(s).tasten.unten_rechts << '\n'
+			<< '\n'
+			<< "Oben:\t\t" << spieler.at(s).tasten.oben << '\n'
+			<< "Unten:\t\t" << spieler.at(s).tasten.unten << '\n'
+			<< "Links:\t\t" << spieler.at(s).tasten.links << '\n'
+			<< "Rechts:\t\t" << spieler.at(s).tasten.rechts << '\n'
+			<< '\n'
+			<< "Obenlinks:\t" << spieler.at(s).tasten.oben_links << '\n'
+			<< "Obenrechts:\t" << spieler.at(s).tasten.oben_rechts << '\n'
+			<< "Untenlinks:\t" << spieler.at(s).tasten.unten_links << '\n'
+			<< "Untenrechts:\t" << spieler.at(s).tasten.unten_rechts << '\n'
+			<< '\n'
+			<< "Pause:\t\t" << spieler.at(s).tasten.menue << '\n';
 	}
 	
 	zeile('*');
 	
 	cout
 		<< "GEBAEUDE\n"
-		<< endl
-		<< spieler.at(0).gebaeude.zentrale.name << endl
+		<< '\n'
+		<< spieler.at(0).gebaeude.zentrale.name << '\n'
 		<< spieler.at(0).gebaeude.zentrale.kosten << "Euro\n"
-		<< spieler.at(0).gebaeude.zentrale.info << endl
-		<< endl
-		<< spieler.at(0).gebaeude.kanone.name << endl
+		<< spieler.at(0).gebaeude.zentrale.info << '\n'
+		<< '\n'
+		<< spieler.at(0).gebaeude.kanone.name << '\n'
 		<< spieler.at(0).gebaeude.kanone.kosten << "Euro\n"
-		<< spieler.at(0).gebaeude.kanone.info << endl
-		<< endl
-		<< spieler.at(0).gebaeude.krankenhaus.name << endl
+		<< spieler.at(0).gebaeude.kanone.info << '\n'
+		<< '\n'
+		<< spieler.at(0).gebaeude.krankenhaus.name << '\n'
 		<< spieler.at(0).gebaeude.krankenhaus.kosten << "Euro\n"
-		<< spieler.at(0).gebaeude.krankenhaus.info << endl
-		<< endl
-		<< spieler.at(0).gebaeude.geldlager.name << endl
+		<< spieler.at(0).gebaeude.krankenhaus.info << '\n'
+		<< '\n'
+		<< spieler.at(0).gebaeude.geldlager.name << '\n'
 		<< spieler.at(0).gebaeude.geldlager.kosten << "Euro\n"
-		<< spieler.at(0).gebaeude.geldlager.info << endl
-		<< endl
-		<< spieler.at(0).gebaeude.mauer.name << endl
+		<< spieler.at(0).gebaeude.geldlager.info << '\n'
+		<< '\n'
+		<< spieler.at(0).gebaeude.mauer.name << '\n'
 		<< spieler.at(0).gebaeude.mauer.kosten << "Euro\n"
-		<< spieler.at(0).gebaeude.mauer.info << endl;
+		<< spieler.at(0).gebaeude.mauer.info << '\n';
 	
 	zeile('*');
 }
@@ -501,7 +500,7 @@ void spielfeld_erstellen(Spielfeld &spielfeld, vector <Spieler> &spieler)
 				cout << ' ';
 			}
 		}
-		cout << endl;
+		cout << '\n';
 	}
 	
 	for (unsigned int sp = 0; sp < spieler.size(); sp ++)
@@ -1644,7 +1643,7 @@ void farben()
 		unsigned char z = f;
 		
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-		cout << f << '\t' << z << endl;
+		cout << f << '\t' << z << '\n';
 	}
 	
 	getch();
@@ -1765,7 +1764,7 @@ int main()
 			<< "3\n"
 			<< "200\n"
 			<< "0\n"
-			<< endl
+			<< '\n'
 			<< "BLAU\n"
 			<< "0\n"
 			<< "2  144 16\n"
@@ -1774,7 +1773,7 @@ int main()
 			<< "3\n"
 			<< "200\n"
 			<< "0\n"
-			<< endl
+			<< '\n'
 			<< "GELB\n"
 			<< "0\n"
 			<< "2  224 96\n"
@@ -1783,7 +1782,7 @@ int main()
 			<< "3\n"
 			<< "200\n"
 			<< "0\n"
-			<< endl
+			<< '\n'
 			<< "GRUEN\n"
 			<< "0\n"
 			<< "2  160 32\n"
