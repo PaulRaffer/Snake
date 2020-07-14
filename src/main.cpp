@@ -6,9 +6,6 @@
 #include <time.h>
 
 
-using namespace std;
-
-
 struct Datum
 {
 	unsigned int
@@ -48,7 +45,7 @@ struct Tasten
 
 struct Seite
 {
-	string name;
+	std::string name;
 	unsigned int naechste_seite;
 };
 
@@ -77,14 +74,14 @@ struct Spielfeld
 		menue_pause = ' ',
 		menue_cheats = '0';
 	
-	vector <Seite> seite_menue;
+	std::vector <Seite> seite_menue;
 	
 	Zeitmessung zeit;
 };
 
 struct Schlange
 {
-	vector <Koordinaten> pos;
+	std::vector <Koordinaten> pos;
 	
 	char
 		richtung,
@@ -137,7 +134,7 @@ struct Gebaeude_y
 	char
 		richtung;
 	
-	vector <Punkt> punkt;
+	std::vector <Punkt> punkt;
 	
 	Zeitmessung zeit_betreten;
 	Zeitmessung zeit_ereignis;
@@ -145,13 +142,13 @@ struct Gebaeude_y
 
 struct Gebaeude_x
 {
-	string
+	std::string
 		name,
 		info;
 	
 	long long kosten;
 	
-	vector <Gebaeude_y> _;
+	std::vector <Gebaeude_y> _;
 };
 
 struct Gebaeude
@@ -166,7 +163,7 @@ struct Gebaeude
 
 struct Spieler
 {
-	string name;
+	std::string name;
 	
 	long long
 		punkte,
@@ -178,7 +175,7 @@ struct Spieler
 		computer = false,
 		gameover = false;
 	
-	vector <unsigned int> farbe;
+	std::vector <unsigned int> farbe;
 	
 	Schlange schlange;
 	Gebaeude gebaeude;
@@ -187,18 +184,18 @@ struct Spieler
 
 struct Punkte
 {
-	vector <Punkt> essen;
+	std::vector <Punkt> essen;
 	
-	vector <Punkt> geld;
-	vector <Punkt> leben;
+	std::vector <Punkt> geld;
+	std::vector <Punkt> leben;
 	Zeitmessung zeit;
 	
-	vector <Punkt> hindernis;
+	std::vector <Punkt> hindernis;
 };
 
 struct Spiel_info
 {
-	string
+	std::string
 		name,
 		version;
 	
@@ -207,9 +204,9 @@ struct Spiel_info
 
 struct Spiel
 {
-	string name;
+	std::string name;
 	Spielfeld spielfeld;
-	vector <Spieler> spieler;
+	std::vector <Spieler> spieler;
 	Punkte punkte;
 };
 
@@ -218,47 +215,47 @@ struct Spiel
 void zeile(char zeichen);
 void spielanleitung(Spiel_info& spiel_info);
 
-int eingaben(Spielfeld &spielfeld, vector <Spieler> &spieler);
+int eingaben(Spielfeld &spielfeld, std::vector <Spieler> &spieler);
 
 
-void spiel_start(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, time_t t);
+void spiel_start(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Punkte &punkte, time_t t);
 
 
-void spielfeld_erstellen(Spielfeld &spielfeld, vector <Spieler> &spieler);
-void punkte_erstellen(vector <Punkt> &punkt, Spielfeld &spielfeld, vector <Spieler> &spieler, time_t t);
-void punkte_zeichnen(vector <Punkt> &punkt);
-void gebaeude_zeichnen(vector <Spieler> &spieler, Gebaeude_x &gebaeude, unsigned int s, unsigned int g);
+void spielfeld_erstellen(Spielfeld &spielfeld, std::vector <Spieler> &spieler);
+void punkte_erstellen(std::vector <Punkt> &punkt, Spielfeld &spielfeld, std::vector <Spieler> &spieler, time_t t);
+void punkte_zeichnen(std::vector <Punkt> &punkt);
+void gebaeude_zeichnen(std::vector <Spieler> &spieler, Gebaeude_x &gebaeude, unsigned int s, unsigned int g);
 
 
-void richtung(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, time_t t);
-void richtung_spieler(char richtung, vector <Spieler> &spieler);
-void richtung_computer(vector <Spieler> &spieler, Punkte &punkte);
+void richtung(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Punkte &punkte, time_t t);
+void richtung_spieler(char richtung, std::vector <Spieler> &spieler);
+void richtung_computer(std::vector <Spieler> &spieler, Punkte &punkte);
 
-void bewegen(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, unsigned long long zaehler, time_t t);
-void gebaeude_betreten(Spielfeld &spielfeld, vector <Spieler> &spieler, Gebaeude_x &gebaeude, unsigned long long s);
-void spieler_bewegen(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, unsigned long long zaehler, unsigned int s, time_t t);
+void bewegen(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Punkte &punkte, unsigned long long zaehler, time_t t);
+void gebaeude_betreten(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Gebaeude_x &gebaeude, unsigned long long s);
+void spieler_bewegen(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Punkte &punkte, unsigned long long zaehler, unsigned int s, time_t t);
 
-void punkte_essen(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, unsigned int s, time_t t);
-void punkte_geld(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, unsigned int s);
-void punkte_leben(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, unsigned int s);
+void punkte_essen(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Punkte &punkte, unsigned int s, time_t t);
+void punkte_geld(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Punkte &punkte, unsigned int s);
+void punkte_leben(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Punkte &punkte, unsigned int s);
 
-void gebaeude_farbe(vector <Spieler> spieler, unsigned int x, unsigned int y, vector <Gebaeude_x> gebaeude, unsigned long long s, unsigned int i);
-void gebaeude(Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s);
-void punkte_bewegen(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, unsigned int s,  time_t t);
+void gebaeude_farbe(std::vector <Spieler> spieler, unsigned int x, unsigned int y, std::vector <Gebaeude_x> gebaeude, unsigned long long s, unsigned int i);
+void gebaeude(Spielfeld &spielfeld, std::vector <Spieler> &spieler, unsigned int s);
+void punkte_bewegen(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Punkte &punkte, unsigned int s,  time_t t);
 
-void spieler_informationen(Spielfeld spielfeld, vector <Spieler> spieler, unsigned int s);
-void spieler_menue(Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s);
-void gebaeude_verschieben(Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Gebaeude_x> &gebaeude, unsigned long long s, bool &v);
-void gebaeude_kaufen(Spielfeld &spielfeld, vector <Spieler> &spieler, Gebaeude_x &gebaeude, unsigned long long s);
-
-
-void menue_pause(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, time_t t);
-void menue_cheats(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, time_t t);
+void spieler_informationen(Spielfeld spielfeld, std::vector <Spieler> spieler, unsigned int s);
+void spieler_menue(Spielfeld &spielfeld, std::vector <Spieler> &spieler, unsigned int s);
+void gebaeude_verschieben(Spielfeld &spielfeld, std::vector <Spieler> &spieler, std::vector <Gebaeude_x> &gebaeude, unsigned long long s, bool &v);
+void gebaeude_kaufen(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Gebaeude_x &gebaeude, unsigned long long s);
 
 
-void leben(Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s);
-bool gameover(Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &hindernis, unsigned int s);
-void gebaeude_gameover(Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Gebaeude_x> &gebaeude, unsigned long long s, unsigned long long sp);
+void menue_pause(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Punkte &punkte, time_t t);
+void menue_cheats(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Punkte &punkte, time_t t);
+
+
+void leben(Spielfeld &spielfeld, std::vector <Spieler> &spieler, unsigned int s);
+bool gameover(Spielfeld &spielfeld, std::vector <Spieler> &spieler, std::vector <Punkt> &hindernis, unsigned int s);
+void gebaeude_gameover(Spielfeld &spielfeld, std::vector <Spieler> &spieler, std::vector <Gebaeude_x> &gebaeude, unsigned long long s, unsigned long long sp);
 
 
 void farben();
@@ -267,20 +264,20 @@ void farben();
 
 void zeile(char zeichen)
 {
-	cout << '\n';
+	std::cout << '\n';
 	for (unsigned int z = 0; z < 100; z ++)
 	{
-		cout << zeichen;
+		std::cout << zeichen;
 	}
-	cout << "\n\n";
+	std::cout << "\n\n";
 }
 
-void spielanleitung(Spiel_info& spiel_info, vector <Spieler> &spieler)
+void spielanleitung(Spiel_info& spiel_info, std::vector <Spieler> &spieler)
 {
-	cout << "SPIELANLEITUNG SNAKE\n";
+	std::cout << "SPIELANLEITUNG SNAKE\n";
 	zeile('*');
 	
-	cout
+	std::cout
 		<< "INFORMATIONEN ZUM SPIEL\n"
 		<< '\n'
 		<< "Name:\t\t" << spiel_info.name << '\n'
@@ -289,7 +286,7 @@ void spielanleitung(Spiel_info& spiel_info, vector <Spieler> &spieler)
 	
 	zeile('*');
 	
-	cout
+	std::cout
 		<< "ENTWICKLER\n"
 		<< '\n'
 		<< "Name:\t\tRaffer Paul\n"
@@ -299,7 +296,7 @@ void spielanleitung(Spiel_info& spiel_info, vector <Spieler> &spieler)
 	
 	zeile('*');
 	
-	cout
+	std::cout
 		<< "SPIELFELD\n"
 		<< '\n'
 		<< "Es kann mit voreingestellter Spielfeldgroesse gespielt (\"1\" oder \"2\" druecken, 1: X=156 Y=71, 2: X=235 Y=63) oder die Spielfeldgroesse vor dem Spiel eingegeben werden.\n"
@@ -314,7 +311,7 @@ void spielanleitung(Spiel_info& spiel_info, vector <Spieler> &spieler)
 	
 	zeile('*');
 	
-	cout
+	std::cout
 		<< "STEUERUNG\n"
 		<< '\n'
 		<< "In den Einstellungen kann man die Tasten, die für die Steuerung verwendet werden festlegen.\n"
@@ -322,7 +319,7 @@ void spielanleitung(Spiel_info& spiel_info, vector <Spieler> &spieler)
 	
 	for (unsigned int s = 0; s < spieler.size(); s ++)
 	{
-		cout
+		std::cout
 			<< "\n\n"
 			<< spieler.at(s).name << '\n'
 			<< '\n'
@@ -347,7 +344,7 @@ void spielanleitung(Spiel_info& spiel_info, vector <Spieler> &spieler)
 	
 	zeile('*');
 	
-	cout
+	std::cout
 		<< "GEBAEUDE\n"
 		<< '\n'
 		<< spieler.at(0).gebaeude.zentrale.name << '\n'
@@ -373,7 +370,7 @@ void spielanleitung(Spiel_info& spiel_info, vector <Spieler> &spieler)
 	zeile('*');
 }
 
-int eingaben(Spielfeld &spielfeld, vector <Spieler> &spieler)
+int eingaben(Spielfeld &spielfeld, std::vector <Spieler> &spieler)
 {
 	int s;
 	
@@ -392,21 +389,21 @@ int eingaben(Spielfeld &spielfeld, vector <Spieler> &spieler)
 		break;
 	
 	default:
-		cout << "ANZAHL DER SPIELER: ";
-		cin >> s;
+		std::cout << "ANZAHL DER SPIELER: ";
+		std::cin >> s;
 	
-		cout << "SPIELFELDGROESSE:\nX: ";
-		cin >> spielfeld.groesse.x;
+		std::cout << "SPIELFELDGROESSE:\nX: ";
+		std::cin >> spielfeld.groesse.x;
 	
-		cout << "Y: ";
-		cin >> spielfeld.groesse.y;
+		std::cout << "Y: ";
+		std::cin >> spielfeld.groesse.y;
 		break;
 	}
 	return s;
 }
 
 
-void spiel_start(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, time_t t)
+void spiel_start(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Punkte &punkte, time_t t)
 {
 	bool wiederholen = true;
 	
@@ -478,7 +475,7 @@ void spiel_start(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte
 }
 
 
-void spielfeld_erstellen(Spielfeld &spielfeld, vector <Spieler> &spieler)
+void spielfeld_erstellen(Spielfeld &spielfeld, std::vector <Spieler> &spieler)
 {
 	system("cls");
 	
@@ -492,15 +489,15 @@ void spielfeld_erstellen(Spielfeld &spielfeld, vector <Spieler> &spieler)
 			|| (y == 0) || (y == spielfeld.groesse.y + 1))
 			{
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe.wand);
-				cout << '+';
+				std::cout << '+';
 			}
 			else
 			{
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe.spielfeld);
-				cout << ' ';
+				std::cout << ' ';
 			}
 		}
-		cout << '\n';
+		std::cout << '\n';
 	}
 	
 	for (unsigned int sp = 0; sp < spieler.size(); sp ++)
@@ -512,18 +509,18 @@ void spielfeld_erstellen(Spielfeld &spielfeld, vector <Spieler> &spieler)
 			
 			if ((spieler.at(sp).schlange.name_anzeigen == true) && (i < spieler.at(sp).name.size()))
 			{
-				cout << spieler.at(sp).name.at(i);
+				std::cout << spieler.at(sp).name.at(i);
 			}
 			else
 			{
-				cout << ' ';
+				std::cout << ' ';
 			}
 		}
 	}
 }
 
 
-void punkte_erstellen(vector <Punkt> &punkt, Spielfeld &spielfeld, vector <Spieler> &spieler, time_t t)
+void punkte_erstellen(std::vector <Punkt> &punkt, Spielfeld &spielfeld, std::vector <Spieler> &spieler, time_t t)
 {
 	bool wiederholen = false;
 	
@@ -560,18 +557,18 @@ void punkte_erstellen(vector <Punkt> &punkt, Spielfeld &spielfeld, vector <Spiel
 }
 
 
-void punkte_zeichnen(vector <Punkt> &punkt)
+void punkte_zeichnen(std::vector <Punkt> &punkt)
 {
 	for (unsigned int p = 0; p < punkt.size(); p ++)
 	{
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), punkt.at(p).farbe);
 		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {punkt.at(p).pos.x, punkt.at(p).pos.y});
-		cout << punkt.at(p).zeichen;
+		std::cout << punkt.at(p).zeichen;
 	}
 }
 
 
-void richtung(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, time_t t)
+void richtung(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Punkte &punkte, time_t t)
 {
 	if (spielfeld.ton == true)
 	{
@@ -603,7 +600,7 @@ void richtung(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, t
 }
 
 
-void gebaeude_zeichnen(vector <Spieler> &spieler, Gebaeude_x &gebaeude, unsigned int s, unsigned int g)
+void gebaeude_zeichnen(std::vector <Spieler> &spieler, Gebaeude_x &gebaeude, unsigned int s, unsigned int g)
 {
 	for (unsigned int y = gebaeude._.at(g).start_pos.y; y <= gebaeude._.at(g).ende_pos.y; y ++)
 	{
@@ -622,13 +619,13 @@ void gebaeude_zeichnen(vector <Spieler> &spieler, Gebaeude_x &gebaeude, unsigned
 			{
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(s).farbe.at(0));
 			}
-			cout << ' ';
+			std::cout << ' ';
 		}
 	}
 }
 
 
-void richtung_spieler(char richtung, vector <Spieler> &spieler)
+void richtung_spieler(char richtung, std::vector <Spieler> &spieler)
 {
 	bool wiederholen;
 	unsigned int sp = 0;
@@ -663,7 +660,7 @@ void richtung_spieler(char richtung, vector <Spieler> &spieler)
 }
 
 
-void richtung_computer(vector <Spieler> &spieler, Punkte &punkte)
+void richtung_computer(std::vector <Spieler> &spieler, Punkte &punkte)
 {
 	for (unsigned int i = 0; i < spieler.size(); i ++)
 	{
@@ -689,7 +686,7 @@ void richtung_computer(vector <Spieler> &spieler, Punkte &punkte)
 	}
 }
 
-void gebaeude_betreten(Spielfeld &spielfeld, vector <Spieler> &spieler, Gebaeude_x &gebaeude, unsigned long long s)
+void gebaeude_betreten(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Gebaeude_x &gebaeude, unsigned long long s)
 {
 	for (unsigned int i = 0; i < gebaeude._.size(); i ++)
 	{
@@ -713,7 +710,7 @@ void gebaeude_betreten(Spielfeld &spielfeld, vector <Spieler> &spieler, Gebaeude
 	}
 }
 
-void bewegen(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, unsigned long long zaehler, time_t t)
+void bewegen(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Punkte &punkte, unsigned long long zaehler, time_t t)
 {
 	for (unsigned int s = 0; s < spieler.size(); s ++)
 	{
@@ -809,12 +806,12 @@ void bewegen(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, un
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spielfeld.farbe.spielfeld);
 	
 		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {punkte.geld.at(0).pos.x, punkte.geld.at(0).pos.y});
-		cout << ' ';
+		std::cout << ' ';
 		punkte.geld.at(0).pos.x = 0;
 		punkte.geld.at(0).pos.y = 0;
 		
 		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {punkte.leben.at(0).pos.x, punkte.leben.at(0).pos.y});
-		cout << ' ';
+		std::cout << ' ';
 		punkte.leben.at(0).pos.x = 0;
 		punkte.leben.at(0).pos.y = 0;
 	}
@@ -837,7 +834,7 @@ void bewegen(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, un
 	}
 }
 
-void gebaeude_farbe(vector <Spieler> spieler, unsigned int x, unsigned int y, Gebaeude_x &gebaeude, unsigned long long s, unsigned int i)
+void gebaeude_farbe(std::vector <Spieler> spieler, unsigned int x, unsigned int y, Gebaeude_x &gebaeude, unsigned long long s, unsigned int i)
 {
 	for (unsigned int g = 0; g < gebaeude._.size(); g ++)
 	{
@@ -852,17 +849,17 @@ void gebaeude_farbe(vector <Spieler> spieler, unsigned int x, unsigned int y, Ge
 	}
 }
 
-void punkte_essen(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, unsigned int s, time_t t)
+void punkte_essen(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Punkte &punkte, unsigned int s, time_t t)
 {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(s).farbe.at(0));
 	
 	spieler.at(s).punkte ++;
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s + 8, spielfeld.groesse.y + 3});
-	cout << spieler.at(s).punkte;
+	std::cout << spieler.at(s).punkte;
 	
 	spieler.at(s).schlange.pos.resize(spieler.at(s).schlange.pos.size() + 1);
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s + 8, spielfeld.groesse.y + 4});
-	cout << spieler.at(s).schlange.pos.size();
+	std::cout << spieler.at(s).schlange.pos.size();
 	
 	spieler.at(s).geld += rand() % 11;
 	
@@ -871,7 +868,7 @@ void punkte_essen(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkt
 	punkte_zeichnen(punkte.essen);
 }
 
-void punkte_geld(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, unsigned int s)
+void punkte_geld(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Punkte &punkte, unsigned int s)
 {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(s).farbe.at(0));
 	
@@ -882,7 +879,7 @@ void punkte_geld(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte
 	spieler_informationen(spielfeld, spieler, s);
 }
 
-void punkte_leben(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, unsigned int s)
+void punkte_leben(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Punkte &punkte, unsigned int s)
 {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(s).farbe.at(0));
 	
@@ -894,7 +891,7 @@ void punkte_leben(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkt
 }
 
 
-void spieler_bewegen(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, unsigned long long zaehler, unsigned int s, time_t t)
+void spieler_bewegen(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Punkte &punkte, unsigned long long zaehler, unsigned int s, time_t t)
 {
 	spieler.at(s).schlange.zeit.ende = clock() - spieler.at(s).schlange.zeit.start;
 	
@@ -909,12 +906,12 @@ void spieler_bewegen(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &pu
 	
 			if ((spieler.at(s).schlange.name_anzeigen == true) && (i < spieler.at(s).name.size()))
 			{
-				cout << spieler.at(s).name.at(i);
+				std::cout << spieler.at(s).name.at(i);
 			}
 	
 			else
 			{
-				cout << ' ';
+				std::cout << ' ';
 			}
 		}
 	
@@ -931,7 +928,7 @@ void spieler_bewegen(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &pu
 		}
 	
 		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spieler.at(s).schlange.pos.at(spieler.at(s).schlange.pos.size() - 1).x, spieler.at(s).schlange.pos.at(spieler.at(s).schlange.pos.size() - 1).y});
-		cout << ' ';
+		std::cout << ' ';
 	
 		if (spieler.at(s).schlange.richtung != ' ')
 		{
@@ -1047,7 +1044,7 @@ void spieler_bewegen(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &pu
 }
 
 
-void gebaeude(Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s)
+void gebaeude(Spielfeld &spielfeld, std::vector <Spieler> &spieler, unsigned int s)
 {
 	for (unsigned int i = 0; i < spieler.at(s).gebaeude.kanone._.size(); i ++)
 	{
@@ -1075,7 +1072,7 @@ void gebaeude(Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s)
 
 
 
-void punkte_bewegen(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, unsigned int s, time_t t)
+void punkte_bewegen(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Punkte &punkte, unsigned int s, time_t t)
 {
 	for (unsigned long long i = 0; i < spieler.at(s).gebaeude.kanone._.size(); i ++)
 	{
@@ -1100,7 +1097,7 @@ void punkte_bewegen(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &pun
 				}
 				
 				SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spieler.at(s).gebaeude.kanone._.at(i).punkt.at(p).pos.x, spieler.at(s).gebaeude.kanone._.at(i).punkt.at(p).pos.y});
-				cout << ' ';
+				std::cout << ' ';
 				
 				if (spieler.at(s).gebaeude.kanone._.at(i).punkt.at(p).richtung == spieler.at(s).tasten.rechts)
 				{
@@ -1124,7 +1121,7 @@ void punkte_bewegen(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &pun
 				
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(s).farbe.at(1));
 				SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spieler.at(s).gebaeude.kanone._.at(i).punkt.at(p).pos.x, spieler.at(s).gebaeude.kanone._.at(i).punkt.at(p).pos.y});
-				cout << ' ';
+				std::cout << ' ';
 	
 				if ((spieler.at(s).gebaeude.kanone._.at(i).punkt.at(p).pos.x == punkte.essen.at(0).pos.x) && (spieler.at(s).gebaeude.kanone._.at(i).punkt.at(p).pos.y == punkte.essen.at(0).pos.y))
 				{
@@ -1167,7 +1164,7 @@ void punkte_bewegen(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &pun
 }
 
 
-void spieler_informationen(Spielfeld spielfeld, vector <Spieler> spieler, unsigned int s)
+void spieler_informationen(Spielfeld spielfeld, std::vector <Spieler> spieler, unsigned int s)
 {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(s).farbe.at(0));
 	
@@ -1181,22 +1178,22 @@ void spieler_informationen(Spielfeld spielfeld, vector <Spieler> spieler, unsign
 	gebaeude_zeichnen(spieler, info, s, 0);
 	
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 2});
-	cout << "Name:   " << spieler.at(s).name;
+	std::cout << "Name:   " << spieler.at(s).name;
 	
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3});
-	cout << "Punkte: " << spieler.at(s).punkte;
+	std::cout << "Punkte: " << spieler.at(s).punkte;
 	
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 4});
-	cout << "Laenge: " << spieler.at(s).schlange.pos.size();
+	std::cout << "Laenge: " << spieler.at(s).schlange.pos.size();
 	
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 5});
-	cout << "Geld:   " << spieler.at(s).geld << " Euro";
+	std::cout << "Geld:   " << spieler.at(s).geld << " Euro";
 	
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 6});
-	cout << "Leben:  " << spieler.at(s).leben;
+	std::cout << "Leben:  " << spieler.at(s).leben;
 }
 
-void gebaeude_verschieben(Spielfeld &spielfeld, vector <Spieler> &spieler, Gebaeude_x &gebaeude, unsigned long long s, bool &v)
+void gebaeude_verschieben(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Gebaeude_x &gebaeude, unsigned long long s, bool &v)
 {
 	for (unsigned int i = 0; i < gebaeude._.size(); i ++)
 	{
@@ -1212,7 +1209,7 @@ void gebaeude_verschieben(Spielfeld &spielfeld, vector <Spieler> &spieler, Gebae
 				
 				for (unsigned int x = gebaeude._.at(i).start_pos.x; x <= gebaeude._.at(i).ende_pos.x; x ++)
 				{
-					cout << ' ';
+					std::cout << ' ';
 				}
 			}
 			
@@ -1264,7 +1261,7 @@ void gebaeude_verschieben(Spielfeld &spielfeld, vector <Spieler> &spieler, Gebae
 	}
 }
 
-void gebaeude_kaufen(Spielfeld &spielfeld, vector <Spieler> &spieler, Gebaeude_x &gebaeude, unsigned long long s)
+void gebaeude_kaufen(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Gebaeude_x &gebaeude, unsigned long long s)
 {
 	gebaeude._.resize(gebaeude._.size() + 1);
 	gebaeude._.at(gebaeude._.size() - 1).level = 1;
@@ -1277,7 +1274,7 @@ void gebaeude_kaufen(Spielfeld &spielfeld, vector <Spieler> &spieler, Gebaeude_x
 	gebaeude._.at(gebaeude._.size() - 1).start_pos.y = spielfeld.groesse.y / 2;
 }
 
-void spieler_menue(Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s)
+void spieler_menue(Spielfeld &spielfeld, std::vector <Spieler> &spieler, unsigned int s)
 {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(s).farbe.at(0));
 	
@@ -1387,80 +1384,80 @@ void spieler_menue(Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int
 		}
 		
 		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 2});
-		cout << "SPIELERMENUE";
+		std::cout << "SPIELERMENUE";
 		
 		if (spieler.at(s).menue_seite == 100)
 		{
 			SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3});
-			cout << "< " << spieler.at(s).gebaeude.zentrale.name << " >";
+			std::cout << "< " << spieler.at(s).gebaeude.zentrale.name << " >";
 			
 			SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 4});
-			cout << "Kosten: " << spieler.at(s).gebaeude.zentrale.kosten << " Euro\t";
+			std::cout << "Kosten: " << spieler.at(s).gebaeude.zentrale.kosten << " Euro\t";
 		}
 		
 		else if (spieler.at(s).menue_seite == 101)
 		{
 			SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3});
-			cout << "< " << spieler.at(s).gebaeude.kanone.name << " >";
+			std::cout << "< " << spieler.at(s).gebaeude.kanone.name << " >";
 			
 			SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 4});
-			cout << "Kosten: " << spieler.at(s).gebaeude.kanone.kosten << " Euro\t";
+			std::cout << "Kosten: " << spieler.at(s).gebaeude.kanone.kosten << " Euro\t";
 		}
 		
 		else if (spieler.at(s).menue_seite == 102)
 		{
 			SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3});
-			cout << "< " << spieler.at(s).gebaeude.krankenhaus.name << " >";
+			std::cout << "< " << spieler.at(s).gebaeude.krankenhaus.name << " >";
 			
 			SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 4});
-			cout << "Kosten: " << spieler.at(s).gebaeude.krankenhaus.kosten << " Euro\t";
+			std::cout << "Kosten: " << spieler.at(s).gebaeude.krankenhaus.kosten << " Euro\t";
 		}
 		
 		else if (spieler.at(s).menue_seite == 103)
 		{
 			SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3});
-			cout << "< " << spieler.at(s).gebaeude.geldlager.name << " >";
+			std::cout << "< " << spieler.at(s).gebaeude.geldlager.name << " >";
 			
 			SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 4});
-			cout << "Kosten: " << spieler.at(s).gebaeude.geldlager.kosten << " Euro\t";
+			std::cout << "Kosten: " << spieler.at(s).gebaeude.geldlager.kosten << " Euro\t";
 		}
 		
 		else if (spieler.at(s).menue_seite == 104)
 		{
 			SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3});
-			cout << "< " << spieler.at(s).gebaeude.mauer.name << " >";
+			std::cout << "< " << spieler.at(s).gebaeude.mauer.name << " >";
 			
 			SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 4});
-			cout << "Kosten: " << spieler.at(s).gebaeude.mauer.kosten << " Euro\t";
+			std::cout << "Kosten: " << spieler.at(s).gebaeude.mauer.kosten << " Euro\t";
 		}
 		
 		else if (spieler.at(s).menue_seite == 105)
 		{
 			SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3});
-			cout << "< " << spieler.at(s).gebaeude.teleporter.name << " >";
+			std::cout << "< " << spieler.at(s).gebaeude.teleporter.name << " >";
 			
 			SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 4});
-			cout << "Kosten: " << spieler.at(s).gebaeude.teleporter.kosten << " Euro\t";
+			std::cout << "Kosten: " << spieler.at(s).gebaeude.teleporter.kosten << " Euro\t";
 		}
 		
 		else
 		{
 			SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 3});
-			cout << "< " << spielfeld.seite_menue.at(spieler.at(s).menue_seite).name << " >";
+			std::cout << "< " << spielfeld.seite_menue.at(spieler.at(s).menue_seite).name << " >";
 		}
 		
 		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s, spielfeld.groesse.y + 5});
-		cout << "Geld: " << spieler.at(s).geld << " Euro\t";
+		std::cout << "Geld: " << spieler.at(s).geld << " Euro\t";
 	}
 	
 	spieler.at(s).schlange.richtung = ' ';
 }
 
-void menue_pause(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, time_t t)
+void menue_pause(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Punkte &punkte, time_t t)
 {
 	system("cls");
 	
-	cout
+	std::cout
 		<< "PAUSE\n"
 		<< "\n"
 		<< "1| ZURUECK ZUM SPIEL\n"
@@ -1483,16 +1480,16 @@ void menue_pause(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte
 }
 
 
-void menue_cheats(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, time_t t)
+void menue_cheats(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Punkte &punkte, time_t t)
 {
 	system("cls");
 	
 	if (spielfeld.cheats == true)
 	{
-		string cheat;
+		std::string cheat;
 		
-		cout << "CHEATS\n\n";
-		cin >> cheat;
+		std::cout << "CHEATS\n\n";
+		std::cin >> cheat;
 		
 		if (cheat == "?")
 		{
@@ -1500,13 +1497,13 @@ void menue_cheats(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkt
 		}
 		else
 		{
-			cout << "falsche Eingabe!";
+			std::cout << "falsche Eingabe!";
 		}
 	}
 	
 	else
 	{
-		cout << "CHEATS SIND DEAKTIVIERT!";
+		std::cout << "CHEATS SIND DEAKTIVIERT!";
 		Sleep(800);
 	}
 	
@@ -1514,7 +1511,7 @@ void menue_cheats(Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkt
 }
 
 
-void leben(Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s)
+void leben(Spielfeld &spielfeld, std::vector <Spieler> &spieler, unsigned int s)
 {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(s).farbe.at(0));
 	
@@ -1529,12 +1526,12 @@ void leben(Spielfeld &spielfeld, vector <Spieler> &spieler, unsigned int s)
 	}
 	
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s + 8, spielfeld.groesse.y + 6});
-	cout << spieler.at(s).leben;
+	std::cout << spieler.at(s).leben;
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * s + 8, spielfeld.groesse.y + 5});
-	cout << spieler.at(s).geld << " EURO      ";
+	std::cout << spieler.at(s).geld << " EURO      ";
 }
 
-void gebaeude_gameover(Spielfeld &spielfeld, vector <Spieler> &spieler, Gebaeude_x &gebaeude, unsigned long long s, unsigned long long sp)
+void gebaeude_gameover(Spielfeld &spielfeld, std::vector <Spieler> &spieler, Gebaeude_x &gebaeude, unsigned long long s, unsigned long long sp)
 {
 	for (unsigned int i = 0; i < gebaeude._.size(); i ++)
 	{
@@ -1550,12 +1547,12 @@ void gebaeude_gameover(Spielfeld &spielfeld, vector <Spieler> &spieler, Gebaeude
 			leben(spielfeld, spieler, s);
 			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(sp).farbe.at(0));
 			SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * sp + 8, spielfeld.groesse.y + 5});
-			cout << spieler.at(sp).geld << " EURO      ";
+			std::cout << spieler.at(sp).geld << " EURO      ";
 		}
 	}
 }
 
-bool gameover(Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &hindernis, unsigned int s)
+bool gameover(Spielfeld &spielfeld, std::vector <Spieler> &spieler, std::vector <Punkt> &hindernis, unsigned int s)
 {
 	bool gameover = spieler.at(s).gameover;
 	
@@ -1586,7 +1583,7 @@ bool gameover(Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &h
 				leben(spielfeld, spieler, s);
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(sp).farbe.at(0));
 				SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * sp + 8, spielfeld.groesse.y + 5});
-				cout << spieler.at(sp).geld << " EURO      ";
+				std::cout << spieler.at(sp).geld << " EURO      ";
 			}
 		}
 		
@@ -1604,7 +1601,7 @@ bool gameover(Spielfeld &spielfeld, vector <Spieler> &spieler, vector <Punkt> &h
 						leben(spielfeld, spieler, s);
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), spieler.at(sp).farbe.at(0));
 						SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {spielfeld.groesse.x / spieler.size() * sp + 8, spielfeld.groesse.y + 5});
-						cout << spieler.at(sp).geld << " EURO      ";
+						std::cout << spieler.at(sp).geld << " EURO      ";
 					}
 				}
 			}
@@ -1643,7 +1640,7 @@ void farben()
 		unsigned char z = f;
 		
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-		cout << f << '\t' << z << '\n';
+		std::cout << f << '\t' << z << '\n';
 	}
 	
 	getch();
@@ -1746,14 +1743,14 @@ int main()
 	spiel.spielfeld.seite_menue.at(10).name = "GEBAEUDE";
 	spiel.spielfeld.seite_menue.at(10).naechste_seite = 100;
 	
-	string name;
-	cin >> name;
+	std::string name;
+	std::cin >> name;
 	
-	ifstream datei(name + ".txt");
+	std::ifstream datei(name + ".txt");
 	
 	if (datei.eof() == false)
 	{
-		ofstream datei(name + ".txt");
+		std::ofstream datei(name + ".txt");
 		
 		datei
 			<< "ROT\n"
