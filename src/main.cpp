@@ -9,31 +9,28 @@
 using namespace std;
 
 
-typedef struct
+struct Datum
 {
 	unsigned int
-	tag,
-	monat,
-	jahr;
-	
-} Datum;
+		tag,
+		monat,
+		jahr;
+};
 
-typedef struct
+struct Zeitmessung
 {
 	double
 		start = clock(),
 		ende,
 		pause;
-	
-} Zeitmessung;
+};
 
-typedef struct
+struct Koordinaten
 {
 	unsigned int x, y;
-	
-} Koordinaten;
+};
 
-typedef struct
+struct Tasten
 {
 	char
 		oben,
@@ -47,26 +44,23 @@ typedef struct
 		unten_rechts,
 		
 		menue;
-	
-} Tasten;
+};
 
-typedef struct
+struct Seite
 {
 	string name;
 	unsigned int naechste_seite;
-	
-} Seite;
+};
 
-typedef struct
+struct Farben
 {
 	unsigned int
 		hintergrund,
 		spielfeld = 600,
 		wand = 200;
-	
-} Farben;
+};
 
-typedef struct
+struct Spielfeld
 {
 	Koordinaten groesse;
 	Farben farbe;
@@ -86,10 +80,9 @@ typedef struct
 	vector <Seite> seite_menue;
 	
 	Zeitmessung zeit;
-	
-} Spielfeld;
+};
 
-typedef struct
+struct Schlange
 {
 	vector <Koordinaten> pos;
 	
@@ -106,10 +99,9 @@ typedef struct
 		bewegen = true;
 	
 	Zeitmessung zeit;
-	
-} Schlange;
+};
 
-typedef struct
+struct Punkt
 {
 	Koordinaten pos;
 	
@@ -124,10 +116,9 @@ typedef struct
 	
 	Zeitmessung
 		zeit;
-	
-} Punkt;
+};
 
-typedef struct
+struct Gebaeude_y
 {
 	bool
 		gebaut = false,
@@ -150,10 +141,9 @@ typedef struct
 	
 	Zeitmessung zeit_betreten;
 	Zeitmessung zeit_ereignis;
-	
-} Gebaeude_y;
+};
 
-typedef struct
+struct Gebaeude_x
 {
 	string
 		name,
@@ -162,10 +152,9 @@ typedef struct
 	long long kosten;
 	
 	vector <Gebaeude_y> _;
-	
-} Gebaeude_x;
+};
 
-typedef struct
+struct Gebaeude
 {
 	Gebaeude_x zentrale;
 	Gebaeude_x kanone;
@@ -173,10 +162,9 @@ typedef struct
 	Gebaeude_x geldlager;
 	Gebaeude_x mauer;
 	Gebaeude_x teleporter;
-	
-} Gebaeude;
+};
 
-typedef struct
+struct Spieler
 {
 	string name;
 	
@@ -195,10 +183,9 @@ typedef struct
 	Schlange schlange;
 	Gebaeude gebaeude;
 	Tasten tasten;
-	
-} Spieler;
+};
 
-typedef struct
+struct Punkte
 {
 	vector <Punkt> essen;
 	
@@ -207,27 +194,24 @@ typedef struct
 	Zeitmessung zeit;
 	
 	vector <Punkt> hindernis;
-	
-} Punkte;
+};
 
-typedef struct
+struct Spiel_info
 {
 	string
 		name,
 		version;
 	
 	Datum datum;
-	
-} Spiel_info;
+};
 
-typedef struct
+struct Spiel
 {
 	string name;
 	Spielfeld spielfeld;
 	vector <Spieler> spieler;
 	Punkte punkte;
-	
-} Spiel;
+};
 
 
 
