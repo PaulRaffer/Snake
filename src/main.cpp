@@ -1,86 +1,3 @@
-/*
-    SPIELANLEITUNG SNAKE
-    ***********************************************************************
-
-    INFORMATIONEN ZUM SPIEL
-
-    Name:           Snake
-    Version:        1.31.0
-    Datum:          --.06.2017
-    Spieler: 1-4
-
-    ************************************************************************
-
-    ENTWICKLER
-
-    Name:           Raffer Paul
-    Schule:         HTBL Hollabrunn
-    Klasse:         1BHEL
-    Katalognummer:  22
-
-    *************************************************************************
-
-    SPIELFELD
-
-    Es kann mit voreingestellter Spielfeldgröße gespielt ("1" oder "2" drücken, 1: X=156 Y=71, 2: X=235 Y=63) oder die Spielfeldgröße vor dem Spiel eingegeben werden.
-
-      0 1 2 3 4 5
-    0 + + + + + +
-    1 +         +
-    2 +         +
-    3 +         +
-    4 +         +
-    5 + + + + + +
-
-    **************************************************************************
-
-    STEUERUNG
-
-    In den Einstellungen kann man die Tsten, die für die Steuerung verwendet werden festlegen.
-    Folgende Tasten sind voreingestellt:
-
-    SPIELER 1       *   SPIELER 2       *   SPIELER 3       *   SPIELER 4
-                    *                   *                   *
-    q   w   e       *   r   t   z       *   u   i   o       *   7   8   9
-      \ | /         *     \ | /         *     \ | /         *     \ | /
-    a --x-- d       *   f --b-- h       *   j --,-- l       *   4 --2-- 6
-      / | \         *     / | \         *     / | \         *     / | \
-    y   s   c       *   v   g   n       *   m   k   .       *   1   5   3
-                    *                   *                   *
-    Oben:       w   *   Oben:       t   *   Oben:       i   *   Oben:       8
-    Unten:      s   *   Unten:      g   *   Unten:      k   *   Unten:      5
-    Links:      a   *   Links:      f   *   Links:      j   *   Links:      4
-    Rechts:     d   *   Rechts:     h   *   Rechts:     l   *   Rechts:     6
-                    *                   *                   *
-    Obenlinks:  q   *   Obenlinks:  r   *   Obenlinks:  u   *   Obenlinks:  7
-    Obenrechts: e   *   Obenrechts: z   *   Obenrechts: o   *   Obenrechts: 9
-    Untenlinks: y   *   Untenlinks: v   *   Untenlinks: m   *   Untenlinks: 1
-    Untenrechts:c   *   Untenrechts:n   *   Untenrechts:.   *   Untenrechts:3
-                    *                   *                   *
-    Pause:      x   *   Pause:      b   *   Pause:      ,   *   Pause:      2
-
-    ***************************************************************************
-
-    GEBÄUDE
-
-    Zentrale
-    Kanone
-    Krankenhaus
-    Geldlager
-    Mauer
-
-    ***************************************************************************
-
-    PUNKTE
-
-    Essen
-    Geld
-    Leben
-    Hindernis
-
-    ***************************************************************************
-*/
-
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -470,18 +387,6 @@ void spielanleitung( Spiel_info& spiel_info, vector <Spieler> &spieler )
          << spieler.at(0).gebaeude.mauer.info << endl;
 
     zeile( '*' );
-
-    /*PUNKTE
-
-    Essen
-    Geld
-    Leben
-    Hindernis
-
-    zeile( '*' );
-
-    getch();*/
-
 }
 
 int eingaben( Spielfeld &spielfeld, vector <Spieler> &spieler )
@@ -617,18 +522,6 @@ void spielfeld_erstellen( Spielfeld &spielfeld, vector <Spieler> &spieler )
 
         cout << endl;
     }
-
-    /*
-        SPIELFELD
-
-          0 1 2 3 4 5
-        0 + + + + + +
-        1 +         +
-        2 +         +
-        3 +         +
-        4 +         +
-        5 + + + + + +
-    */
 
     for( unsigned int sp = 0; sp < spieler.size(); sp ++ )
     {
@@ -928,36 +821,6 @@ void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, u
                 }
             }
         }
-/*
-
-        for( unsigned int i = 0; i < spieler.at(s).gebaeude.teleporter._.size(); i ++ )
-        {
-            if( spieler.at(s).gebaeude.teleporter._.at(i).betreten == true )
-            {
-                if(( spieler.at(s).schlange.richtung == spieler.at(s).tasten.unten ) && ( spieler.at(s).gebaeude.teleporter._.size() >= 2 ))
-                {
-                    if( i == 0 )
-                    {
-                        spieler.at(s).schlange.pos.at(0).x = ( spieler.at(s).gebaeude.teleporter._.at(1).start_pos.x + spieler.at(s).gebaeude.teleporter._.at(1).ende_pos.x ) / 2;
-                        spieler.at(s).schlange.pos.at(0).y = ( spieler.at(s).gebaeude.teleporter._.at(1).start_pos.y + spieler.at(s).gebaeude.teleporter._.at(1).ende_pos.y ) / 2;
-                    }
-
-                    else if( i == 1 )
-                    {
-                        spieler.at(s).schlange.pos.at(1).x = ( spieler.at(s).gebaeude.teleporter._.at(0).start_pos.x + spieler.at(s).gebaeude.teleporter._.at(0).ende_pos.x ) / 2;
-                        spieler.at(s).schlange.pos.at(1).y = ( spieler.at(s).gebaeude.teleporter._.at(0).start_pos.y + spieler.at(s).gebaeude.teleporter._.at(0).ende_pos.y ) / 2;
-                    }
-
-                    spieler.at(s).schlange.richtung = spieler.at(s).schlange.richtung_alt;
-                    spieler.at(s).schlange.bewegen = true;
-                    spieler.at(s).gebaeude.teleporter._.at(i).betreten = false;
-                    i = spieler.at(s).gebaeude.teleporter._.size() + 1;
-                }
-            }
-        }*/
-
-
-
 
         if( spieler.at(s).schlange.bewegen == true )
         {
@@ -971,7 +834,6 @@ void bewegen( Spielfeld &spielfeld, vector <Spieler> &spieler, Punkte &punkte, u
         {
             SetCursorPos( 2000, 2000 );
         }
-
     }
 
     static unsigned int zufall;
@@ -2087,37 +1949,5 @@ int main()
         spiel.spielfeld.zeit.start = clock();
         spiel_start( spiel.spielfeld, spiel.spieler, spiel.punkte, t );
 
-
-        /*system( "cls" );
-        cout << "SPIELENDE";
-
-        Spielfeld spielende;
-        spielende.groesse.x = 20 * spieler.size();
-        spielende.groesse.y = 0;
-
-        for( unsigned int s = 0; s < spieler.size(); s ++ )
-        {
-            spieler_informationen( spielende, spieler, s );
-        }
-
-        cout << endl
-             << endl
-             << "1| WIEDERHOLEN\n"
-             << "2| NEUES SPIEL\n"
-             << "0| BEENDEN\n";
-
-        wiederholen = getch();*/
-
-
-/*
-AUFGABEN:
-gebaeude nicht übereinander bauen
-gebeude beim verschieben neu färben *
-teleporter fertigstellen
-mehr files
-gebaeude verbessern
-gebaeude abreißen
-gebaeude verschieben
-*/
     return 0;
 }
